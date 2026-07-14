@@ -1,0 +1,3037 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VisitorFlow - Premium Timeline & Schedule Dashboard</title>
+  
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    /* CSS VARIABLES - DESIGN SYSTEM */
+    :root {
+      --primary: #0f172a;       /* Slate 900 */
+      --secondary: #475569;     /* Slate 600 */
+      --muted: #94a3b8;         /* Slate 400 */
+      --border: #e2e8f0;        /* Slate 200 */
+      --bg-main: #f1f5f9;       /* Slate 100 */
+      --white: #ffffff;
+      
+      --accent-blue: #2563eb;
+      --accent-blue-hover: #1d4ed8;
+      
+      /* Status Colors from original script */
+      --success: #1d9e75;       /* Green */
+      --success-bg: #e1f5ee;
+      
+      --warning: #ca8a04;       /* Honey Gold */
+      --warning-bg: #fef9c3;    /* Soft Honey Yellow */
+      --warning-text: #854d0e;  /* Dark Honey Gold for contrast */
+      
+      --info: #378add;          /* Info/CEO */
+      --info-bg: #e6f1fb;
+      
+      --danger: #e24b4a;        /* Red */
+      --danger-bg: #fcebeb;
+      
+
+    }
+
+    /* GLOBAL RESET */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-main);
+      color: var(--primary);
+      height: 100vh;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+
+    /* SCROLLBAR STYLING */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+
+    /* APP CONTAINER (FULL SCREEN) */
+    .app-container {
+      width: 100vw;
+      height: 100vh;
+      background: var(--white);
+      display: flex;
+      overflow: hidden;
+    }
+
+    /* SIDEBAR (LEFT) */
+    .sidebar {
+      width: 280px;
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      background-color: #fafafa;
+      flex-shrink: 0;
+      overflow-y: auto;
+    }
+
+    .sidebar-header {
+      padding: 24px;
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      border-bottom: 1px solid #f1f5f9;
+    }
+
+    .brand {
+      font-weight: 700;
+      font-size: 20px;
+    }
+
+    .brand .black {
+      color: #0f172a; /* Black */
+    }
+
+    .brand .blue {
+      color: #2563eb; /* Active Blue */
+    }
+
+    /* MINI CALENDAR */
+    .mini-calendar {
+      padding: 24px 24px 16px;
+      flex-shrink: 0;
+      border-bottom: 1px solid #f1f5f9;
+    }
+
+    /* OFFICE LAYOUT MAP IN SIDEBAR */
+    .sidebar-layout {
+      padding: 20px 24px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+
+    .sidebar-layout-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .sidebar-layout-container {
+      background-color: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .sidebar-layout-img {
+      max-width: 100%;
+      height: auto;
+      max-height: 220px;
+      object-fit: contain;
+      border-radius: 4px;
+    }
+
+    .mini-cal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .mini-cal-month {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .mini-cal-nav {
+      display: flex;
+      gap: 4px;
+    }
+
+    .mini-cal-btn {
+      background: transparent;
+      border: none;
+      color: var(--secondary);
+      cursor: pointer;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      transition: background-color 0.15s;
+    }
+
+    .mini-cal-btn:hover {
+      background-color: #f1f5f9;
+    }
+
+    .mini-cal-weekdays {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      text-align: center;
+      margin-bottom: 8px;
+    }
+
+    .mini-cal-weekday {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+
+    .mini-cal-days {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      row-gap: 6px;
+      text-align: center;
+    }
+
+    .mini-cal-day {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--primary);
+      width: 26px;
+      height: 26px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .mini-cal-day:hover {
+      background-color: #f1f5f9;
+    }
+
+    .mini-cal-day.muted {
+      color: var(--muted);
+      opacity: 0.5;
+    }
+
+    .mini-cal-day.selected {
+      background-color: var(--accent-blue);
+      color: var(--white) !important;
+      font-weight: 700;
+    }
+
+    /* MAIN CONTENT (RIGHT) */
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* MAIN HEADER */
+    .main-header {
+      padding: 24px 32px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .main-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .new-schedule-btn {
+      background-color: var(--accent-blue);
+      color: var(--white);
+      border: none;
+      padding: 10px 18px;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: background-color 0.15s, transform 0.1s;
+    }
+
+    .new-schedule-btn:hover {
+      background-color: var(--accent-blue-hover);
+    }
+
+    .new-schedule-btn:active {
+      transform: scale(0.98);
+    }
+
+    /* CONTROL FILTER BAR */
+    .control-bar {
+      padding: 0 32px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .control-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .today-btn {
+      background-color: var(--white);
+      border: 1px solid var(--border);
+      padding: 8px 16px;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .today-btn:hover {
+      background-color: #f8fafc;
+      border-color: var(--muted);
+    }
+
+    .nav-arrows {
+      display: flex;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .nav-arrow-btn {
+      background-color: var(--white);
+      border: none;
+      width: 34px;
+      height: 34px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--secondary);
+      transition: background-color 0.15s;
+    }
+
+    .nav-arrow-btn:hover {
+      background-color: #f8fafc;
+    }
+
+    .nav-arrow-btn:first-child {
+      border-right: 1px solid var(--border);
+    }
+
+    .current-period {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--primary);
+      margin-left: 12px;
+    }
+
+    .control-right {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .search-container {
+      position: relative;
+    }
+
+    .search-input {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 12px 8px 32px;
+      font-family: inherit;
+      font-size: 12px;
+      color: var(--primary);
+      outline: none;
+      width: 180px;
+      transition: all 0.15s;
+    }
+
+    .search-input:focus {
+      border-color: var(--accent-blue);
+      width: 220px;
+    }
+
+    .search-icon-svg {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted);
+      pointer-events: none;
+    }
+
+    .view-switcher {
+      background-color: #f1f5f9;
+      border-radius: 8px;
+      padding: 3px;
+      display: flex;
+      gap: 2px;
+    }
+
+    .view-tab-btn {
+      border: none;
+      background: transparent;
+      padding: 6px 12px;
+      font-family: inherit;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--secondary);
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .view-tab-btn.active {
+      background-color: var(--white);
+      color: var(--primary);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    /* SCHEDULE TIMELINE GRID VIEWPORT */
+    .grid-viewport {
+      flex: 1;
+      overflow-y: auto;
+      position: relative;
+      background-color: var(--white);
+    }
+
+    .schedule-grid {
+      display: flex;
+      flex-direction: column;
+      min-width: 900px;
+      position: relative;
+    }
+
+    /* GRID HEADER (DAYS OR ROOMS) */
+    .grid-header {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+      background: var(--white);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .grid-header-spacer {
+      width: 80px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      color: var(--muted);
+      font-weight: 600;
+      border-right: 1px solid var(--border);
+      background-color: var(--white);
+    }
+
+    .grid-header-cols {
+      flex: 1;
+      display: flex;
+    }
+
+    .grid-col-header {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 14px 0;
+      border-right: 1px solid #f1f5f9;
+      text-align: center;
+    }
+
+    .grid-col-header:last-child {
+      border-right: none;
+    }
+
+    .grid-col-title {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .grid-col-subtitle {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--primary);
+      margin-top: 4px;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      transition: all 0.2s;
+    }
+
+    .grid-col-header.is-highlighted .grid-col-subtitle {
+      background: var(--accent-blue);
+      color: var(--white);
+    }
+
+    .grid-col-header.is-highlighted .grid-col-title {
+      color: var(--accent-blue);
+    }
+
+    /* GRID BODY */
+    .grid-body {
+      display: flex;
+      position: relative;
+      height: 640px; /* 8 hours * 80px */
+    }
+
+    .grid-time-column {
+      width: 80px;
+      flex-shrink: 0;
+      border-right: 1px solid var(--border);
+      position: relative;
+      background: var(--white);
+      z-index: 5;
+    }
+
+    .grid-time-slot {
+      height: 80px;
+      position: relative;
+    }
+
+    .grid-time-label {
+      position: absolute;
+      top: -8px;
+      right: 12px;
+      font-size: 11px;
+      color: var(--muted);
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    /* Prevent the first hour label (10:00 AM) from getting clipped by sticky header */
+    .grid-time-slot:first-child .grid-time-label {
+      top: 4px;
+    }
+
+    .grid-columns-container {
+      flex: 1;
+      display: flex;
+      position: relative;
+    }
+
+    .grid-column {
+      flex: 1;
+      position: relative;
+      height: 100%;
+      border-right: 1px solid #f1f5f9;
+    }
+
+    .grid-column:last-child {
+      border-right: none;
+    }
+
+    /* Clickable half-hour grid cells */
+    .grid-cell-block {
+      height: 40px; /* 30 minutes block */
+      border-bottom: 1px dotted #f1f5f9;
+      position: relative;
+      cursor: pointer;
+      transition: background-color 0.15s;
+    }
+
+    .grid-cell-block:nth-child(even) {
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .grid-cell-block:hover {
+      background-color: #f8fafc;
+    }
+
+    .grid-cell-block::after {
+      content: '+';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: var(--accent-blue);
+      font-size: 18px;
+      font-weight: 600;
+      opacity: 0;
+      transition: opacity 0.15s;
+    }
+
+    .grid-cell-block:hover::after {
+      opacity: 1;
+    }
+
+    .grid-cell-block.is-booked {
+      cursor: default;
+    }
+
+    .grid-cell-block.is-booked:hover {
+      background-color: transparent;
+    }
+
+    .grid-cell-block.is-booked::after {
+      display: none !important;
+    }
+
+    /* RED TIME LINE */
+    #current-time-line {
+      position: absolute;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background-color: #ef4444;
+      z-index: 8;
+      pointer-events: none;
+      display: none;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #current-time-line::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: -4px;
+      width: 10px;
+      height: 10px;
+      background-color: #ef4444;
+      border-radius: 50%;
+    }
+
+    .time-line-badge {
+      background-color: #0f172a;
+      color: var(--white);
+      font-size: 10px;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 999px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+      transform: translateY(-50%);
+      white-space: nowrap;
+    }
+
+    /* APPOINTMENT BLOCKS */
+    .appointment-block {
+      position: absolute;
+      left: 6px;
+      right: 6px;
+      border-radius: 8px;
+      padding: 8px 10px;
+      font-size: 11px;
+      overflow: hidden;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: transform 0.12s, box-shadow 0.12s;
+      z-index: 3;
+      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05);
+      border-left: 4px solid #cbd5e1; /* Base border width & fallback color */
+    }
+
+
+
+    /* CEO Approval Needed (Amber background, border-left color remains priority-based) */
+    /* CEO Pending Status (Grey with slate border) */
+    .appointment-block.ceo-pending {
+      background-color: var(--warning-bg) !important;
+      border-left: 4px solid var(--warning) !important;
+      color: var(--warning-text) !important;
+    }
+    .appointment-block.ceo-pending .appt-title {
+      color: var(--warning-text) !important;
+    }
+    .appointment-block.ceo-pending .appt-time {
+      color: var(--warning-text) !important;
+      opacity: 0.95;
+    }
+    .appointment-block.ceo-pending .appt-badge {
+      background-color: rgba(202, 138, 4, 0.1) !important;
+      color: var(--warning-text) !important;
+    }
+
+    .monthly-booking-badge.ceo-pending-badge {
+      background-color: var(--warning-bg) !important;
+      border-left: 2px solid var(--warning) !important;
+      color: var(--warning-text) !important;
+    }
+
+    /* CEO Meet Status (Soft Blue with blue border) */
+    .appointment-block.ceo-meet {
+      background-color: #eff6ff !important;
+      border-left: 4px solid #3b82f6 !important;
+      color: #1e3a8a !important;
+    }
+    .appointment-block.ceo-meet .appt-title {
+      color: #1e3a8a !important;
+    }
+    .appointment-block.ceo-meet .appt-time {
+      color: #2563eb !important;
+      opacity: 0.95;
+    }
+    .appointment-block.ceo-meet .appt-badge {
+      background-color: rgba(37, 99, 235, 0.1) !important;
+      color: #1e3a8a !important;
+    }
+
+    .monthly-booking-badge.ceo-meet-badge {
+      background-color: #eff6ff !important;
+      border-left: 2px solid #3b82f6 !important;
+      color: #1e3a8a !important;
+    }
+
+    .appointment-block:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 12px rgba(15, 23, 42, 0.08);
+      z-index: 6;
+    }
+
+    /* SHORT APPOINTMENT CARD (30 mins or less) */
+    .appointment-block.short-appt {
+      padding: 3px 6px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 1px;
+    }
+
+    .appointment-block.short-appt .appt-header-row {
+      display: flex;
+      flex-direction: column;
+      gap: 0px;
+    }
+
+    .appointment-block.short-appt .appt-title {
+      font-size: 10px;
+      font-weight: 700;
+      line-height: 1.15;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .appointment-block.short-appt .appt-time {
+      font-size: 8px;
+      line-height: 1.1;
+      opacity: 0.9;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .appt-header-row {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      overflow: hidden;
+    }
+
+    .appt-title {
+      font-weight: 700;
+      font-size: 11px;
+      line-height: 1.2;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .appt-time {
+      font-size: 9px;
+      font-weight: 600;
+      opacity: 0.8;
+      white-space: nowrap;
+    }
+
+    .appt-badge {
+      font-size: 9px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      align-self: flex-start;
+      background-color: rgba(255, 255, 255, 0.45);
+      white-space: nowrap;
+    }
+
+    /* Color variations for purposes of visit (Liked by user) */
+    /* Standard Confirmed Booking Styles */
+    .appointment-block.confirmed {
+      background-color: #f0fdf4 !important;
+      color: #15803d !important;
+      border-left: 4px solid #10b981 !important;
+    }
+    .appointment-block.confirmed .appt-title { color: #15803d !important; }
+    .appointment-block.confirmed .appt-time { color: #15803d !important; }
+    .appointment-block.confirmed .appt-badge { color: #15803d !important; }
+
+    /* MONTHLY VIEW CALENDAR SPECIFIC STYLING */
+    .monthly-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      grid-template-rows: 40px repeat(6, 1fr);
+      background-color: var(--border);
+      gap: 1px;
+      height: 100%;
+      width: 100%;
+      min-width: 900px;
+    }
+
+    .monthly-header-cell {
+      background-color: #fafafa;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .monthly-day-cell {
+      background-color: var(--white);
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      cursor: pointer;
+      transition: background-color 0.15s;
+      min-height: 85px;
+      position: relative;
+    }
+
+    .monthly-day-cell:hover {
+      background-color: #f8fafc;
+    }
+
+    .monthly-day-number {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--primary);
+      width: 22px;
+      height: 22px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+    }
+
+    .monthly-day-cell.muted {
+      background-color: #fdfdfd;
+    }
+
+    .monthly-day-cell.muted .monthly-day-number {
+      color: var(--muted);
+      opacity: 0.5;
+    }
+
+    .monthly-day-cell.is-selected-date .monthly-day-number {
+      border: 1.5px solid var(--accent-blue);
+      color: var(--accent-blue);
+      font-weight: 700;
+    }
+
+    .monthly-day-cell.is-today .monthly-day-number {
+      background-color: var(--accent-blue);
+      color: var(--white);
+      font-weight: 700;
+    }
+
+    .monthly-bookings-list {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      margin-top: 6px;
+      overflow-y: auto;
+    }
+
+    .monthly-booking-badge {
+      font-size: 9px;
+      font-weight: 700;
+      padding: 2px 5px;
+      border-radius: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      border-left: 2px solid;
+    }
+
+    /* Confirmed coloring for Monthly badges */
+    .monthly-booking-badge.confirmed {
+      background-color: #f0fdf4 !important;
+      color: #15803d !important;
+      border-left: 2px solid #10b981 !important;
+    }
+
+    /* MODALS */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(15, 23, 42, 0.4);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-card {
+      background-color: var(--white);
+      width: 520px;
+      max-width: 90%;
+      border-radius: 16px;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+      display: flex;
+      flex-direction: column;
+      transform: scale(0.95);
+      transition: transform 0.2s ease;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+
+    .modal-overlay.active .modal-card {
+      transform: scale(1);
+    }
+
+    .modal-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .modal-title-wrapper {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .modal-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    .modal-subtitle {
+      font-size: 12px;
+      color: var(--secondary);
+      margin-top: 4px;
+      font-weight: 500;
+    }
+
+    .close-btn {
+      background: transparent;
+      border: none;
+      font-size: 20px;
+      color: var(--muted);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      transition: background-color 0.15s;
+    }
+
+    .close-btn:hover {
+      background-color: #f1f5f9;
+      color: var(--primary);
+    }
+
+    .modal-body {
+      padding: 24px;
+      overflow-y: auto;
+      max-height: 70vh;
+    }
+
+    .form-section-title {
+      font-size: 11px;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: var(--accent-blue);
+      letter-spacing: 0.5px;
+      margin-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 6px;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .form-group label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+    }
+
+    .form-group input,
+    .form-group select {
+      height: 38px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 0 12px;
+      font-family: inherit;
+      font-size: 13px;
+      color: var(--primary);
+      outline: none;
+      background-color: var(--white);
+      transition: border-color 0.15s;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+      border-color: var(--accent-blue);
+    }
+
+    .form-row {
+      display: flex;
+      gap: 16px;
+    }
+
+    .form-row .form-group {
+      flex: 1;
+    }
+
+    /* PRIORITY BUTTONS */
+    .priority-row {
+      display: flex;
+      gap: 12px;
+      margin-top: 4px;
+    }
+
+    .priority-btn {
+      flex: 1;
+      height: 38px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background-color: var(--white);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--primary);
+      transition: all 0.15s;
+    }
+
+    .priority-btn.active[data-priority="Critical"] {
+      background-color: var(--danger-bg);
+      border-color: var(--danger);
+      color: var(--danger);
+    }
+
+    .priority-btn.active[data-priority="Medium"] {
+      background-color: var(--warning-bg);
+      border-color: var(--warning);
+      color: var(--warning);
+    }
+
+    .priority-btn.active[data-priority="Low"] {
+      background-color: var(--success-bg);
+      border-color: var(--success);
+      color: var(--success);
+    }
+
+    /* BUTTONS */
+    .modal-footer {
+      padding: 16px 24px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      background-color: #f8fafc;
+    }
+
+    .btn {
+      height: 38px;
+      padding: 0 16px;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+      border: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.15s;
+    }
+
+    .btn-ghost {
+      background-color: transparent;
+      color: var(--secondary);
+    }
+
+    .btn-ghost:hover {
+      background-color: #e2e8f0;
+      color: var(--primary);
+    }
+
+    .btn-primary {
+      background-color: var(--accent-blue);
+      color: var(--white);
+    }
+
+    .btn-primary:hover {
+      background-color: var(--accent-blue-hover);
+    }
+
+    .btn-danger-outline {
+      background-color: transparent;
+      border: 1px solid #ef4444;
+      color: #ef4444;
+    }
+
+    .btn-danger-outline:hover {
+      background-color: #fef2f2;
+    }
+
+    /* READ-ONLY DETAILS */
+    .details-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .details-item {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .details-item.full-width {
+      grid-column: span 2;
+    }
+
+    .details-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: var(--muted);
+      margin-bottom: 4px;
+      letter-spacing: 0.5px;
+    }
+
+    .details-val {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--primary);
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 8px;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      border-radius: 4px;
+      align-self: flex-start;
+      margin-top: 2px;
+    }
+
+    .badge.confirmed {
+      background-color: var(--success-bg);
+      color: var(--success);
+    }
+
+    .badge.pending {
+      background-color: var(--warning-bg);
+      color: var(--warning-text);
+    }
+
+    .badge.escalated {
+      background-color: var(--info-bg);
+      color: var(--info);
+    }
+
+    .badge.critical {
+      background-color: var(--danger-bg);
+      color: var(--danger);
+    }
+    
+    .badge.medium {
+      background-color: var(--warning-bg);
+      color: var(--warning-text);
+    }
+    
+    .badge.low {
+      background-color: var(--success-bg);
+      color: var(--success);
+    }
+
+    /* TOASTS */
+    #toast-container {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      pointer-events: none;
+    }
+
+    .toast {
+      background-color: #0f172a;
+      color: var(--white);
+      padding: 12px 18px;
+      font-size: 13px;
+      font-weight: 600;
+      border-radius: 8px;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 280px;
+      border-left: 4px solid var(--accent-blue);
+      animation: toast-in 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      pointer-events: auto;
+    }
+
+    .toast.error {
+      border-left-color: #ef4444;
+    }
+
+    .toast.success {
+      border-left-color: #10b981;
+    }
+
+    @keyframes toast-in {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    @keyframes toast-out {
+      from { transform: translateY(0); opacity: 1; }
+      to { transform: translateY(-20px); opacity: 0; }
+    }
+
+    /* BUSY BLOCKS STYLING */
+    .appointment-block.busy-appt {
+      background-color: #f1f5f9 !important;
+      border-left: 4px solid #94a3b8 !important;
+      color: #475569 !important;
+      cursor: default;
+    }
+    .appointment-block.busy-appt:hover {
+      transform: none !important;
+      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.05) !important;
+      z-index: 3 !important;
+    }
+    .appointment-block.busy-appt .appt-title {
+      color: #475569 !important;
+    }
+    .appointment-block.busy-appt .appt-time {
+      color: #64748b !important;
+    }
+
+    .monthly-booking-badge.busy-badge {
+      background-color: #f1f5f9 !important;
+      border-left: 2px solid #94a3b8 !important;
+      color: #475569 !important;
+      cursor: default;
+    }
+
+    /* Refresh rotation animation */
+    @keyframes spin-refresh {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    .spinning-icon {
+      animation: spin-refresh 0.8s linear infinite;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- APP FLOATING CARD -->
+  <div class="app-container">
+    
+    <!-- SIDEBAR (LEFT) - simplified: only logo and mini-calendar -->
+    <div class="sidebar">
+      
+      <!-- Brand Header -->
+      <div class="sidebar-header">
+        <a href="#" style="text-decoration: none;">
+          <img src="Kaynes Logo Svg.svg" alt="Kaynes Circuits" class="brand-logo" style="height: 38px; width: auto; display: block;">
+        </a>
+      </div>
+
+      <!-- Mini Calendar Container (Flex expanding to fill top area) -->
+      <div class="mini-calendar">
+        <div class="mini-cal-header">
+          <span class="mini-cal-month" id="mini-cal-month-label">November 2026</span>
+          <div class="mini-cal-nav">
+            <button class="mini-cal-btn" id="mini-prev-month-btn" title="Previous Month">
+              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            </button>
+            <button class="mini-cal-btn" id="mini-next-month-btn" title="Next Month">
+              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </button>
+          </div>
+        </div>
+        <div class="mini-cal-weekdays">
+          <span class="mini-cal-weekday">M</span>
+          <span class="mini-cal-weekday">T</span>
+          <span class="mini-cal-weekday">W</span>
+          <span class="mini-cal-weekday">T</span>
+          <span class="mini-cal-weekday">F</span>
+          <span class="mini-cal-weekday">S</span>
+          <span class="mini-cal-weekday">S</span>
+        </div>
+        <div class="mini-cal-days" id="mini-cal-days-container">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
+
+      <!-- Office Layout Map -->
+      <div class="sidebar-layout">
+        <div class="sidebar-layout-title">Office Layout Map</div>
+        <div class="sidebar-layout-container">
+          <img src="Layout.svg" alt="Office Layout" class="sidebar-layout-img">
+        </div>
+      </div>
+
+    </div>
+
+    <!-- MAIN DASHBOARD CONTENT (RIGHT) -->
+    <div class="main-content">
+      
+      <!-- Top Title Header -->
+      <div class="main-header">
+        <h1 class="main-title"><span style="color: #0f172a;">Visitor</span><span style="color: #2563eb;">Flow</span></h1>
+      </div>
+
+      <!-- Controls Sub-Bar -->
+      <div class="control-bar">
+        <div class="control-left">
+          <button class="today-btn" id="today-btn">Today</button>
+          <button class="today-btn" id="refresh-btn" title="Sync Calendar" style="display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 36px; padding: 0; margin-left: 8px;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" id="refresh-icon-svg"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+          </button>
+          <div class="nav-arrows" style="margin-left: 8px;">
+            <button class="nav-arrow-btn" id="prev-btn" title="Previous">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            </button>
+            <button class="nav-arrow-btn" id="next-btn" title="Next">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </button>
+          </div>
+          <span class="current-period" id="current-period-label">September 2024</span>
+        </div>
+
+        <div class="control-right">
+          <!-- Search Bar -->
+          <div class="search-container">
+            <svg class="search-icon-svg" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <input type="text" class="search-input" id="search-input" placeholder="Search visitors or host...">
+          </div>
+
+          <!-- View Switch Tabs -->
+          <div class="view-switcher" id="view-switcher">
+            <button class="view-tab-btn" data-view="daily">Daily</button>
+            <button class="view-tab-btn active" data-view="weekly">Weekly</button>
+            <button class="view-tab-btn" data-view="monthly">Monthly</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- TIMELINE VIEWPORT (THE GRID) -->
+      <div class="grid-viewport" id="grid-viewport">
+        <div class="schedule-grid" id="schedule-grid">
+          
+          <!-- Sticky Header (Timezone spacer + Days/Rooms of active grid) -->
+          <div class="grid-header" id="grid-header">
+            <div class="grid-header-spacer" id="grid-header-spacer-label">GMT+05:30</div>
+            <div class="grid-header-cols" id="grid-header-cols">
+              <!-- Dynamically populated columns SUN to SAT / Room 1 to Table 3 -->
+            </div>
+          </div>
+
+          <!-- Grid Body (Time column and grid columns container) -->
+          <div class="grid-body" id="grid-body">
+            
+            <!-- Time Column (Left labels) -->
+            <div class="grid-time-column" id="grid-time-column">
+              <!-- Dynamically populated 10am to 6pm hourly marks -->
+            </div>
+
+            <!-- Columns Container (Interactive Day/Room Columns) -->
+            <div class="grid-columns-container" id="grid-columns-container">
+              
+              <!-- Red time line overlay -->
+              <div id="current-time-line">
+                <div class="time-line-badge" id="time-line-badge-content">12:00 PM</div>
+              </div>
+              
+              <!-- Dynamically populated grid columns here -->
+
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- BOOKING MODAL -->
+  <div class="modal-overlay" id="booking-modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title-wrapper">
+          <div class="modal-title">Book a Slot</div>
+          <div class="modal-subtitle" id="booking-modal-subtitle">Selected Resource & Time Window</div>
+        </div>
+        <button class="close-btn" id="close-booking-modal-btn">&times;</button>
+      </div>
+      <form id="booking-form">
+        <div class="modal-body">
+          
+          <!-- Host Details -->
+          <div class="form-section-title">Host Details</div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="host-first-name">Host First Name *</label>
+              <input type="text" id="host-first-name" required placeholder="e.g. Rajesh">
+            </div>
+            <div class="form-group">
+              <label for="host-last-name">Host Last Name</label>
+              <input type="text" id="host-last-name" placeholder="e.g. Kumar">
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="host-email">Host Official Email *</label>
+              <input type="email" id="host-email" required placeholder="e.g. r.kumar@kaynes.com">
+            </div>
+            <div class="form-group">
+              <label for="host-dept">Department *</label>
+              <select id="host-dept" required>
+                <option value="" disabled selected>Select Department</option>
+                <option value="Operations">Operations</option>
+                <option value="Quality">Quality</option>
+                <option value="IT">IT</option>
+                <option value="Procurement">Procurement</option>
+                <option value="Admin">Admin</option>
+                <option value="Finance">Finance</option>
+                <option value="HR">HR</option>
+                <option value="Others">Others</option>
+              </select>
+              <div class="form-group" id="dept-specify-group" style="display: none; margin-top: 12px; margin-bottom: 0;">
+                <label for="host-dept-specify">Others (please specify) *</label>
+                <input type="text" id="host-dept-specify" placeholder="Please specify your department">
+              </div>
+            </div>
+          </div>
+
+          <!-- Visitor Details -->
+          <div class="form-section-title" style="margin-top: 10px;">Visitor Details</div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="visitor-name">Primary Visitor Name *</label>
+              <input type="text" id="visitor-name" required placeholder="e.g. Raj Kumar">
+            </div>
+            <div class="form-group">
+              <label for="visitor-company">Visitor Company *</label>
+              <input type="text" id="visitor-company" required placeholder="e.g. IT Support Services">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="visitor-email">Primary Visitor Mail Id</label>
+            <input type="email" id="visitor-email" placeholder="e.g. raj@itsupport.com">
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="num-visitors">No. of Visitors (expected) *</label>
+              <input type="number" id="num-visitors" min="1" required value="1">
+            </div>
+            <div class="form-group">
+              <label>Duration *</label>
+              <div style="display: flex; gap: 8px;">
+                <select id="duration-hours" style="flex: 1; min-width: 0;" required></select>
+                <select id="duration-minutes" style="flex: 1; min-width: 0;" required></select>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="visit-purpose">Purpose of Visit *</label>
+              <input type="text" id="visit-purpose" required placeholder="e.g. Technical Support">
+            </div>
+            <div class="form-group">
+              <label for="booking-room">Room / Table *</label>
+              <select id="booking-room" required>
+                <option value="Room 1">Room 1 (8 seats)</option>
+                <option value="Room 2">Room 2 (6 seats)</option>
+                <option value="Room 3">Room 3 (4 seats)</option>
+                <option value="Table 1">Table 1 (4 seats)</option>
+                <option value="Table 2">Table 2 (4 seats)</option>
+                <option value="Table 3">Table 3 (4 seats)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="ceo-approval">Need CEO approval? *</label>
+              <select id="ceo-approval" required>
+                <option value="No" selected>No</option>
+                <option value="Yes">Yes</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="food-requirement">Food Requirement</label>
+              <select id="food-requirement">
+                <option value="" disabled selected>Select Yes / No</option>
+                <option value="Yes">Yes</option>
+                <option value="No">No</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-top: 10px;">
+            <label for="event-visibility">Event Visibility *</label>
+            <select id="event-visibility" required>
+              <option value="Public" selected>Public (Shows details on calendar)</option>
+              <option value="Private">Private (Shows only as "busy")</option>
+            </select>
+            <span style="font-size: 10px; color: var(--secondary); margin-top: 4px; display: block;">
+              Public will show the event details on the calendar and private will only show as busy.
+            </span>
+          </div>
+
+          <div class="form-group" style="margin-top: 10px;">
+            <label for="booking-remarks">Remarks</label>
+            <textarea id="booking-remarks" placeholder="Any additional comments or requests" style="border: 1px solid var(--border); border-radius: 6px; padding: 10px 12px; font-family: inherit; font-size: 13px; color: var(--primary); outline: none; background-color: var(--white); transition: border-color 0.15s; resize: vertical; min-height: 60px;"></textarea>
+          </div>
+
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-ghost" id="cancel-booking-btn">Cancel</button>
+          <button type="submit" class="btn btn-primary">Book Now</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- DETAILS MODAL -->
+  <div class="modal-overlay" id="details-modal-overlay">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-title-wrapper">
+          <div class="modal-title" id="details-modal-title">Booking Details</div>
+          <div class="modal-subtitle" id="details-modal-subtitle">Room X · Date · Time Window</div>
+        </div>
+        <button class="close-btn" id="close-details-modal-btn">&times;</button>
+      </div>
+      <div class="modal-body">
+        
+        <!-- Public Details Container -->
+        <div id="details-public-body">
+          <!-- Visitor Info -->
+          <div class="form-section-title">Visitor Information</div>
+          <div class="details-grid" style="margin-bottom: 20px;">
+            <div class="details-item">
+              <span class="details-label">Primary Visitor Name</span>
+              <span class="details-val" id="det-visitor-name">-</span>
+            </div>
+            <div class="details-item">
+              <span class="details-label">Visitor Company</span>
+              <span class="details-val" id="det-visitor-company">-</span>
+            </div>
+            <div class="details-item">
+              <span class="details-label">Primary Visitor Mail Id</span>
+              <span class="details-val" id="det-visitor-email">-</span>
+            </div>
+            <div class="details-item">
+              <span class="details-label">No. of Visitors (expected)</span>
+              <span class="details-val" id="det-num-visitors">-</span>
+            </div>
+            <div class="details-item full-width">
+              <span class="details-label">Purpose of Visit</span>
+              <span class="details-val" id="det-purpose">-</span>
+            </div>
+          </div>
+
+          <!-- Host Info -->
+          <div class="form-section-title">Host Information</div>
+          <div class="details-grid" style="margin-bottom: 20px;">
+            <div class="details-item">
+              <span class="details-label">Host Name</span>
+              <span class="details-val" id="det-host-name">-</span>
+            </div>
+            <div class="details-item">
+              <span class="details-label">Department</span>
+              <span class="details-val" id="det-host-dept">-</span>
+            </div>
+            <div class="details-item full-width">
+              <span class="details-label">Host Official Email</span>
+              <span class="details-val" id="det-host-email">-</span>
+            </div>
+          </div>
+
+          <!-- Status & Visibility -->
+          <div class="form-section-title">Visibility & Requirements</div>
+          <div class="details-grid" style="margin-bottom: 20px;">
+            <div class="details-item">
+              <span class="details-label">Booking Status</span>
+              <div><span class="badge" id="det-status-badge">Confirmed</span></div>
+            </div>
+            <div class="details-item">
+              <span class="details-label">Event Visibility</span>
+              <span class="details-val" id="det-visibility">-</span>
+            </div>
+            <div class="details-item">
+              <span class="details-label">Need CEO Approval?</span>
+              <span class="details-val" id="det-ceo-approval">-</span>
+            </div>
+            <div class="details-item">
+              <span class="details-label">Food Requirement</span>
+              <span class="details-val" id="det-food-requirement">-</span>
+            </div>
+          </div>
+
+          <!-- Remarks -->
+          <div class="form-section-title">Remarks</div>
+          <div class="details-grid">
+            <div class="details-item full-width">
+              <span class="details-val" id="det-remarks">-</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Private / Busy Container -->
+        <div id="details-private-body" style="display: none; padding: 32px 16px; text-align: center;">
+          <div style="display: inline-flex; align-items: center; justify-content: center; width: 64px; height: 64px; border-radius: 50%; background-color: #f1f5f9; color: #64748b; margin-bottom: 16px;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+          </div>
+          <h3 style="font-size: 20px; font-weight: 700; color: #0f172a; margin-bottom: 8px;">Private Booking</h3>
+          <p style="font-size: 14px; color: #64748b; margin-bottom: 4px;">This slot is booked and marked as private.</p>
+          <div id="det-private-time" style="display: inline-block; background-color: #f1f5f9; color: #0f172a; font-size: 13px; font-weight: 600; padding: 6px 14px; border-radius: 999px; margin-top: 12px;">-</div>
+        </div>
+
+      </div>
+      <div class="modal-footer" id="details-modal-footer">
+        <button type="button" class="btn btn-danger-outline" id="det-delete-btn">Delete Booking</button>
+        <button type="button" class="btn btn-ghost" id="close-details-btn">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION CONTAINER -->
+  <div id="toast-container"></div>
+
+  <!-- APPLICATION JAVASCRIPT -->
+  <script>
+    // -------------------------------------------------------------
+    // DATA CONFIGURATION
+    // -------------------------------------------------------------
+    const START_HOUR = 0;   // 12:00 AM (00:00)
+    const END_HOUR = 24;    // 12:00 AM next day (24:00)
+    const INTERVALS = 48;   // 48 half-hour blocks
+    const HOUR_HEIGHT = 80;  // Height of one hour in pixels
+    const MINS_IN_HOUR = 60;
+
+    const RESOURCES = [
+      { id: 'Room 1', name: 'Room 1', seats: 8 },
+      { id: 'Room 2', name: 'Room 2', seats: 6 },
+      { id: 'Room 3', name: 'Room 3', seats: 4 },
+      { id: 'Table 1', name: 'Table 1', seats: 4 },
+      { id: 'Table 2', name: 'Table 2', seats: 4 },
+      { id: 'Table 3', name: 'Table 3', seats: 4 }
+    ];
+
+
+
+    // STATE
+    let currentView = 'weekly'; // 'daily', 'weekly', 'monthly'
+    let selectedDate = new Date(); // Load today's date by default
+    let bookings = [];
+    let selectedPriority = 'Medium';
+    let currentSelectedRoom = '';
+    let currentSelectedDateStr = '';
+    let currentSelectedTimeMinutes = 0;
+    let viewingBookingId = null;
+    let searchQuery = '';
+
+    // -------------------------------------------------------------
+    // INITIALIZATION & PRE-POPULATE DATA
+    // -------------------------------------------------------------
+    function initSampleBookings() {
+      bookings = [];
+    }
+
+    // -------------------------------------------------------------
+    // HELPERS & FORMATTING
+    // -------------------------------------------------------------
+    function formatDateString(date) {
+      const yyyy = date.getFullYear();
+      const mm = String(date.getMonth() + 1).padStart(2, '0');
+      const dd = String(date.getDate()).padStart(2, '0');
+      return `${yyyy}-${mm}-${dd}`;
+    }
+
+    function parseDateSafely(dateInput) {
+      if (!dateInput) return null;
+      if (dateInput instanceof Date) return dateInput;
+      const str = String(dateInput).trim();
+      
+      // If it is an ISO string with time and timezone (e.g. T or Z), parse it via standard Date constructor to retain timezone offset
+      if (str.includes('T') || str.includes('Z')) {
+        return new Date(str);
+      }
+      
+      const yyyymmddMatch = str.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+      if (yyyymmddMatch) {
+        const y = parseInt(yyyymmddMatch[1], 10);
+        const m = parseInt(yyyymmddMatch[2], 10) - 1;
+        const d = parseInt(yyyymmddMatch[3], 10);
+        return new Date(y, m, d);
+      }
+      const mdyyyyMatch = str.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+      if (mdyyyyMatch) {
+        const m = parseInt(mdyyyyMatch[1], 10) - 1;
+        const d = parseInt(mdyyyyMatch[2], 10);
+        const y = parseInt(mdyyyyMatch[3], 10);
+        return new Date(y, m, d);
+      }
+      return new Date(str);
+    }
+
+    function timeStrToMinutes(timeStr) {
+      if (!timeStr) return 0;
+      timeStr = String(timeStr).trim();
+      const isPM = /pm/i.test(timeStr);
+      const isAM = /am/i.test(timeStr);
+      const cleanTime = timeStr.replace(/[ap]m/i, '').trim();
+      const parts = cleanTime.split(':');
+      let hours = parseInt(parts[0], 10);
+      let minutes = parts[1] ? parseInt(parts[1], 10) : 0;
+      if (isNaN(hours)) hours = 0;
+      if (isNaN(minutes)) minutes = 0;
+      if (isPM && hours < 12) {
+        hours += 12;
+      } else if (isAM && hours === 12) {
+        hours = 0;
+      }
+      return hours * 60 + minutes;
+    }
+
+    function minutesToTimeStr(m) {
+      const hh = Math.floor(m / 60);
+      const mm = m % 60;
+      return `${String(hh).padStart(2, '0')}:${String(mm).padStart(2, '0')}`;
+    }
+
+    function minutesToDisplayStr(m) {
+      let hh = Math.floor(m / 60);
+      const mm = m % 60;
+      const ampm = hh >= 12 ? 'PM' : 'AM';
+      hh = hh % 12;
+      hh = hh ? hh : 12;
+      const mmStr = String(mm).padStart(2, '0');
+      return `${hh}:${mmStr} ${ampm}`;
+    }
+
+    function minutesToCompactDisplayStr(m) {
+      let hh = Math.floor(m / 60);
+      const mm = m % 60;
+      const ampm = hh >= 12 ? 'pm' : 'am';
+      hh = hh % 12;
+      hh = hh ? hh : 12;
+      const mmStr = String(mm).padStart(2, '0');
+      return `${hh}:${mmStr}${ampm}`;
+    }
+
+    function getStartOfWeek(date) {
+      const d = new Date(date);
+      const day = d.getDay();
+      const diff = d.getDate() - day; // Sun = 0
+      return new Date(d.setDate(diff));
+    }
+
+    function checkOverlap(room, dateStr, startMin, endMin, excludeId = null) {
+      return bookings.some(b => {
+        if (b.id === excludeId) return false;
+        if (b.room !== room || b.date !== dateStr) return false;
+        const bStart = timeStrToMinutes(b.startTime);
+        const bEnd = timeStrToMinutes(b.endTime);
+        return (startMin < bEnd && endMin > bStart);
+      });
+    }
+
+    function isBookingPrivate(booking) {
+      return booking && booking.eventVisibility && booking.eventVisibility.trim().toLowerCase() === 'private';
+    }
+
+    // -------------------------------------------------------------
+    // TOAST NOTIFICATIONS
+    // -------------------------------------------------------------
+    function showToast(message, type = 'success') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = `toast ${type}`;
+      toast.innerHTML = `
+        <span>${message}</span>
+        <span style="cursor:pointer; font-size: 16px; margin-left: 10px;" onclick="this.parentElement.remove()">&times;</span>
+      `;
+      container.appendChild(toast);
+      
+      setTimeout(() => {
+        toast.style.animation = 'toast-out 0.2s forwards';
+        toast.addEventListener('animationend', () => toast.remove());
+      }, 3500);
+    }
+
+    // -------------------------------------------------------------
+    // MINI CALENDAR RENDERING
+    // -------------------------------------------------------------
+    let miniCalCurrentMonth = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1);
+
+    function renderMiniCalendar() {
+      const container = document.getElementById('mini-cal-days-container');
+      const label = document.getElementById('mini-cal-month-label');
+      container.innerHTML = '';
+      
+      const year = miniCalCurrentMonth.getFullYear();
+      const month = miniCalCurrentMonth.getMonth();
+      
+      const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+      label.innerText = `${monthNames[month]} ${year}`;
+      
+      const firstDayDate = new Date(year, month, 1);
+      let startDayIdx = firstDayDate.getDay() - 1; // Mon = 0, Sun = 6
+      if (startDayIdx < 0) startDayIdx = 6;
+      
+      const totalDays = new Date(year, month + 1, 0).getDate();
+      const prevMonthDays = new Date(year, month, 0).getDate();
+      
+      // Render prev month days
+      for (let i = startDayIdx - 1; i >= 0; i--) {
+        const dayDiv = document.createElement('div');
+        dayDiv.className = 'mini-cal-day muted';
+        dayDiv.innerText = prevMonthDays - i;
+        container.appendChild(dayDiv);
+      }
+      
+      // Render current month days
+      const activeYear = selectedDate.getFullYear();
+      const activeMonth = selectedDate.getMonth();
+      const activeDay = selectedDate.getDate();
+      
+      for (let day = 1; day <= totalDays; day++) {
+        const dayDiv = document.createElement('div');
+        dayDiv.className = 'mini-cal-day';
+        dayDiv.innerText = day;
+        
+        if (year === activeYear && month === activeMonth && day === activeDay) {
+          dayDiv.classList.add('selected');
+        }
+        
+        dayDiv.addEventListener('click', () => {
+          selectedDate = new Date(year, month, day);
+          updateScheduler();
+        });
+        
+        container.appendChild(dayDiv);
+      }
+      
+      // Render next month days to complete 42 slots
+      const currentSlots = startDayIdx + totalDays;
+      const remainingSlots = 42 - currentSlots;
+      for (let day = 1; day <= remainingSlots; day++) {
+        const dayDiv = document.createElement('div');
+        dayDiv.className = 'mini-cal-day muted';
+        dayDiv.innerText = day;
+        container.appendChild(dayDiv);
+      }
+    }
+
+    document.getElementById('mini-prev-month-btn').addEventListener('click', () => {
+      miniCalCurrentMonth.setMonth(miniCalCurrentMonth.getMonth() - 1);
+      renderMiniCalendar();
+    });
+
+    document.getElementById('mini-next-month-btn').addEventListener('click', () => {
+      miniCalCurrentMonth.setMonth(miniCalCurrentMonth.getMonth() + 1);
+      renderMiniCalendar();
+    });
+
+    // -------------------------------------------------------------
+    // MAIN CALENDAR RENDERING PIPELINE
+    // -------------------------------------------------------------
+    function renderTimeColumn() {
+      const timeCol = document.getElementById('grid-time-column');
+      timeCol.innerHTML = '';
+      
+      for (let hour = START_HOUR; hour <= END_HOUR; hour++) {
+        const slot = document.createElement('div');
+        slot.className = 'grid-time-slot';
+        
+        const label = document.createElement('span');
+        label.className = 'grid-time-label';
+        
+        let displayHour = hour % 12;
+        displayHour = displayHour ? displayHour : 12;
+        const ampm = hour >= 12 ? 'PM' : 'AM';
+        label.innerText = `${displayHour}:00 ${ampm}`;
+        
+        slot.appendChild(label);
+        timeCol.appendChild(slot);
+      }
+    }
+
+    function renderSchedulerGrid() {
+      const gridHeaderSpacerLabel = document.getElementById('grid-header-spacer-label');
+      const headerCols = document.getElementById('grid-header-cols');
+      const columnsContainer = document.getElementById('grid-columns-container');
+      const gridBody = document.getElementById('grid-body');
+      const gridTimeCol = document.getElementById('grid-time-column');
+
+      // Clear dynamic layout
+      headerCols.innerHTML = '';
+      const line = document.getElementById('current-time-line');
+      columnsContainer.innerHTML = '';
+      columnsContainer.appendChild(line);
+
+      // Handle query search filter
+      const filteredBookings = bookings.filter(b => {
+        if (!searchQuery) return true;
+        const q = searchQuery.toLowerCase();
+        if (isBookingPrivate(b)) {
+          return (
+            "busy".includes(q) ||
+            b.room.toLowerCase().includes(q)
+          );
+        }
+        return (
+          b.visitorName.toLowerCase().includes(q) ||
+          b.visitorCompany.toLowerCase().includes(q) ||
+          b.purpose.toLowerCase().includes(q) ||
+          b.room.toLowerCase().includes(q) ||
+          `${b.hostFirstName} ${b.hostLastName}`.toLowerCase().includes(q)
+        );
+      });
+
+      if (currentView === 'daily') {
+        // Daily View: Columns = Room 1, Room 2, Room 3, Table 1, Table 2, Table 3
+        gridHeaderSpacerLabel.innerText = "Time";
+        gridTimeCol.style.display = 'block';
+        gridBody.style.height = "1920px"; // 24 hours * 80px
+
+        const activeDateStr = formatDateString(selectedDate);
+        document.getElementById('current-period-label').innerText = selectedDate.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+        RESOURCES.forEach(res => {
+          // Render Header
+          const colHeader = document.createElement('div');
+          colHeader.className = 'grid-col-header';
+          colHeader.innerHTML = `
+            <span class="grid-col-title">${res.name}</span>
+            <span class="grid-col-subtitle" style="font-size:12px; font-weight:600; color:var(--accent-blue); background:none; width:auto; height:auto; margin-top:2px;">${res.seats} seats</span>
+          `;
+          headerCols.appendChild(colHeader);
+
+          // Render column body
+          const col = document.createElement('div');
+          col.className = 'grid-column';
+          col.setAttribute('data-room-id', res.id);
+
+          // Render clickable time triggers
+          for (let s = 0; s < INTERVALS; s++) {
+            const blockMins = START_HOUR * 60 + s * 30;
+            const cell = document.createElement('div');
+            cell.className = 'grid-cell-block';
+            
+            if (checkOverlap(res.id, activeDateStr, blockMins, blockMins + 30)) {
+              cell.classList.add('is-booked');
+            }
+            
+            cell.addEventListener('click', (e) => {
+              if (cell.classList.contains('is-booked')) return;
+              if (e.target.closest('.appointment-block')) return;
+              openBookingModal(activeDateStr, blockMins, res.id);
+            });
+            col.appendChild(cell);
+          }
+          columnsContainer.appendChild(col);
+
+          // Render bookings for this room today
+          const roomBookings = filteredBookings.filter(b => b.date === activeDateStr && b.room === res.id);
+          drawColumnBookingBlocks(col, roomBookings, false);
+        });
+
+      } else if (currentView === 'weekly') {
+        // Weekly View: Columns = Sunday to Saturday of the active week
+        gridHeaderSpacerLabel.innerText = "GMT+05:30";
+        gridTimeCol.style.display = 'block';
+        gridBody.style.height = "1920px";
+
+        const startOfWeek = getStartOfWeek(selectedDate);
+        const dayNames = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+        const todayStr = formatDateString(new Date());
+
+        const weekDates = [];
+        for (let i = 0; i < 7; i++) {
+          const currentDate = new Date(startOfWeek);
+          currentDate.setDate(startOfWeek.getDate() + i);
+          weekDates.push(currentDate);
+
+          const currentDateStr = formatDateString(currentDate);
+
+          // Render header cell
+          const colHeader = document.createElement('div');
+          colHeader.className = 'grid-col-header';
+          if (currentDateStr === todayStr) {
+            colHeader.classList.add('is-highlighted');
+          }
+          colHeader.innerHTML = `
+            <span class="grid-col-title">${dayNames[i]}</span>
+            <span class="grid-col-subtitle">${currentDate.getDate()}</span>
+          `;
+          headerCols.appendChild(colHeader);
+
+          // Render column body
+          const col = document.createElement('div');
+          col.className = 'grid-column';
+          col.setAttribute('data-date', currentDateStr);
+
+          // Render triggers
+          for (let s = 0; s < INTERVALS; s++) {
+            const blockMins = START_HOUR * 60 + s * 30;
+            const cell = document.createElement('div');
+            cell.className = 'grid-cell-block';
+            cell.addEventListener('click', (e) => {
+              if (e.target.closest('.appointment-block')) return;
+              
+              const clickedParts = currentDateStr.split('-');
+              selectedDate = new Date(parseInt(clickedParts[0]), parseInt(clickedParts[1]) - 1, parseInt(clickedParts[2]));
+              currentView = 'daily';
+              
+              // Update switcher active tab
+              document.querySelectorAll('.view-tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.getAttribute('data-view') === 'daily') btn.classList.add('active');
+              });
+
+              updateScheduler();
+              scrollToDefaultTime();
+            });
+            col.appendChild(cell);
+          }
+          columnsContainer.appendChild(col);
+
+          // Render bookings for this day
+          const dayBookings = filteredBookings.filter(b => b.date === currentDateStr);
+          drawColumnBookingBlocks(col, dayBookings, true);
+        }
+
+        // Title range label
+        const periodLabel = document.getElementById('current-period-label');
+        const startMonth = weekDates[0].toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+        const endMonth = weekDates[6].toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+        if (startMonth === endMonth) {
+          periodLabel.innerText = startMonth;
+        } else {
+          periodLabel.innerText = `${weekDates[0].toLocaleDateString('en-US', { month: 'short' })} - ${weekDates[6].toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}`;
+        }
+
+      } else if (currentView === 'monthly') {
+        // Monthly View: Standard Calendar Grid
+        gridTimeCol.style.display = 'none';
+        gridBody.style.height = "auto";
+        gridBody.style.overflow = "visible";
+
+        const year = selectedDate.getFullYear();
+        const month = selectedDate.getMonth();
+        document.getElementById('current-period-label').innerText = selectedDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
+        // Generate full-width monthly layout
+        const monthlyGrid = document.createElement('div');
+        monthlyGrid.className = 'monthly-grid';
+
+        const dayNames = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+        dayNames.forEach(dName => {
+          const headerCell = document.createElement('div');
+          headerCell.className = 'monthly-header-cell';
+          headerCell.innerText = dName;
+          monthlyGrid.appendChild(headerCell);
+        });
+
+        const firstDayDate = new Date(year, month, 1);
+        let startDayIdx = firstDayDate.getDay(); // Sun = 0, Mon = 1, etc.
+        const totalDays = new Date(year, month + 1, 0).getDate();
+        const prevMonthDays = new Date(year, month, 0).getDate();
+
+        const todayStr = formatDateString(new Date());
+        const selectedStr = formatDateString(selectedDate);
+
+        // Previous month filler days
+        for (let i = startDayIdx - 1; i >= 0; i--) {
+          const fillerDay = prevMonthDays - i;
+          const fillerDateStr = formatDateString(new Date(year, month - 1, fillerDay));
+          const cell = createMonthlyDayCell(fillerDay, fillerDateStr, true, todayStr, selectedStr, filteredBookings);
+          monthlyGrid.appendChild(cell);
+        }
+
+        // Current month active days
+        for (let day = 1; day <= totalDays; day++) {
+          const activeDateStr = formatDateString(new Date(year, month, day));
+          const cell = createMonthlyDayCell(day, activeDateStr, false, todayStr, selectedStr, filteredBookings);
+          monthlyGrid.appendChild(cell);
+        }
+
+        // Next month filler days to complete rows (up to 42 cells)
+        const currentSlots = startDayIdx + totalDays;
+        const remainingSlots = 42 - currentSlots;
+        for (let day = 1; day <= remainingSlots; day++) {
+          const fillerDateStr = formatDateString(new Date(year, month + 1, day));
+          const cell = createMonthlyDayCell(day, fillerDateStr, true, todayStr, selectedStr, filteredBookings);
+          monthlyGrid.appendChild(cell);
+        }
+
+        columnsContainer.appendChild(monthlyGrid);
+      }
+
+      updateCurrentTimeLine();
+    }
+
+    function createMonthlyDayCell(dayNumber, dateStr, isMuted, todayStr, selectedStr, allBookings) {
+      const cell = document.createElement('div');
+      cell.className = 'monthly-day-cell';
+      if (isMuted) cell.classList.add('muted');
+      if (dateStr === todayStr) cell.classList.add('is-today');
+      if (dateStr === selectedStr) cell.classList.add('is-selected-date');
+
+      cell.innerHTML = `<span class="monthly-day-number">${dayNumber}</span>`;
+
+      // Filter day bookings
+      const dayBookings = allBookings.filter(b => b.date === dateStr);
+      if (dayBookings.length > 0) {
+        const listContainer = document.createElement('div');
+        listContainer.className = 'monthly-bookings-list';
+        
+        dayBookings.sort((a,b) => timeStrToMinutes(a.startTime) - timeStrToMinutes(b.startTime));
+        dayBookings.forEach(booking => {
+          const badge = document.createElement('div');
+          const isPrivate = isBookingPrivate(booking);
+          if (isPrivate) {
+            badge.className = `monthly-booking-badge busy-badge`;
+            badge.innerText = `${booking.startTime} - ${booking.room} Busy`;
+            badge.addEventListener('click', (e) => {
+              e.stopPropagation();
+              openDetailsModal(booking.id);
+            });
+          } else {
+            let statusClass = 'confirmed';
+            if (booking.status === 'pending') {
+              statusClass = 'ceo-pending-badge';
+            } else if (booking.status === 'meet') {
+              statusClass = 'ceo-meet-badge';
+            }
+            badge.className = `monthly-booking-badge ${statusClass}`;
+            const monthlyDisplayTitle = booking.visitorCompany ? `${booking.visitorName} - ${booking.visitorCompany}` : booking.visitorName;
+            badge.innerText = `${booking.startTime} - ${monthlyDisplayTitle} (${booking.room})`;
+            badge.addEventListener('click', (e) => {
+              e.stopPropagation();
+              openDetailsModal(booking.id);
+            });
+          }
+          listContainer.appendChild(badge);
+        });
+        cell.appendChild(listContainer);
+      }
+
+      cell.addEventListener('click', () => {
+        const clickedParts = dateStr.split('-');
+        selectedDate = new Date(parseInt(clickedParts[0]), parseInt(clickedParts[1]) - 1, parseInt(clickedParts[2]));
+        currentView = 'daily';
+        
+        // Update switcher active tab
+        document.querySelectorAll('.view-tab-btn').forEach(btn => {
+          btn.classList.remove('active');
+          if (btn.getAttribute('data-view') === 'daily') btn.classList.add('active');
+        });
+
+        updateScheduler();
+        scrollToDefaultTime();
+      });
+
+      return cell;
+    }
+
+    function drawColumnBookingBlocks(col, columnBookings, showRoomLabel) {
+      // Sort bookings by start time
+      columnBookings.sort((a, b) => timeStrToMinutes(a.startTime) - timeStrToMinutes(b.startTime));
+      
+      // Calculate overlapping layout clusters
+      const clusters = [];
+      columnBookings.forEach(booking => {
+        const startMin = timeStrToMinutes(booking.startTime);
+        const endMin = timeStrToMinutes(booking.endTime);
+        
+        let placed = false;
+        for (let c = 0; c < clusters.length; c++) {
+          const cluster = clusters[c];
+          const overlaps = cluster.some(item => {
+            const itemStart = timeStrToMinutes(item.startTime);
+            const itemEnd = timeStrToMinutes(item.endTime);
+            return (startMin < itemEnd && endMin > itemStart);
+          });
+          
+          if (overlaps) {
+            cluster.push(booking);
+            placed = true;
+            break;
+          }
+        }
+        if (!placed) {
+          clusters.push([booking]);
+        }
+      });
+
+      // Render bookings cluster offsets
+      clusters.forEach(cluster => {
+        const columns = [];
+        cluster.forEach(booking => {
+          let colIdx = 0;
+          while (true) {
+            if (!columns[colIdx]) {
+              columns[colIdx] = [];
+            }
+            const overlaps = columns[colIdx].some(item => {
+              const startA = timeStrToMinutes(booking.startTime);
+              const endA = timeStrToMinutes(booking.endTime);
+              const startB = timeStrToMinutes(item.startTime);
+              const endB = timeStrToMinutes(item.endTime);
+              return (startA < endB && endA > startB);
+            });
+            
+            if (!overlaps) {
+              columns[colIdx].push(booking);
+              booking.layoutColIdx = colIdx;
+              break;
+            }
+            colIdx++;
+          }
+        });
+
+        const totalCols = columns.length;
+        cluster.forEach(booking => {
+          const startMin = timeStrToMinutes(booking.startTime);
+          const endMin = timeStrToMinutes(booking.endTime);
+          const duration = endMin - startMin;
+          
+          // top calculation ratio: hourly height is 80px (starting from 10:00 AM)
+          // Ratio = 80px / 60mins = 1.33333px per min
+          const topPx = (startMin - (START_HOUR * 60)) * (HOUR_HEIGHT / MINS_IN_HOUR);
+          const heightPx = duration * (HOUR_HEIGHT / MINS_IN_HOUR);
+          
+          const isPrivate = isBookingPrivate(booking);
+          const card = document.createElement('div');
+          if (isPrivate) {
+            card.className = `appointment-block busy-appt`;
+          } else {
+            let statusClass = 'confirmed';
+            if (booking.status === 'pending') {
+              statusClass = 'ceo-pending';
+            } else if (booking.status === 'meet') {
+              statusClass = 'ceo-meet';
+            }
+            card.className = `appointment-block ${statusClass}`;
+          }
+          card.style.top = `${topPx}px`;
+          card.style.height = `${heightPx}px`;
+          
+          const widthPct = 90 / totalCols;
+          const leftPct = 5 + (booking.layoutColIdx * widthPct);
+          card.style.width = `calc(${widthPct}% - 6px)`;
+          card.style.left = `${leftPct}%`;
+          
+          const displayTitle = isPrivate 
+            ? (showRoomLabel ? `${booking.room} busy` : 'busy')
+            : (booking.visitorCompany ? `${booking.visitorName} - ${booking.visitorCompany}` : booking.visitorName);
+
+          const isPendingApproval = (booking.ceoApproval === 'Yes' && booking.status === 'pending');
+          const isMeetRequested = (booking.status === 'meet');
+          
+          let iconHtml = '';
+          if (isPendingApproval) {
+            // clock waiting icon
+            iconHtml = '<svg style="width: 12px; height: 12px; fill: currentColor; display: inline-block; vertical-align: middle; margin-right: 4px;" viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm0 18c-4.4 0-8-3.6-8-8s3.6-8 8-8 8 3.6 8 8-3.6 8-8 8zm.5-13H11v6l5.2 3.2.8-1.3-4.5-2.7V7z"/></svg>';
+          } else if (isMeetRequested) {
+            // conversation bubble icon
+            iconHtml = '<svg style="width: 12px; height: 12px; fill: currentColor; display: inline-block; vertical-align: middle; margin-right: 4px;" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/></svg>';
+          }
+          
+          // Compact layout for appointments 30 minutes or shorter
+          if (duration <= 30) {
+            card.classList.add('short-appt');
+            if (isPrivate) {
+              card.innerHTML = `
+                <div class="appt-header-row">
+                  <div class="appt-title" title="${displayTitle}">${displayTitle}</div>
+                  <div class="appt-time" title="${minutesToDisplayStr(startMin)} - ${minutesToDisplayStr(endMin)}">
+                    ${minutesToCompactDisplayStr(startMin)} - ${minutesToCompactDisplayStr(endMin)}
+                  </div>
+                </div>
+              `;
+            } else {
+              let cleanLabel = booking.purpose || '';
+              if (cleanLabel.toLowerCase() === 'other') {
+                cleanLabel = '';
+              }
+              const roomLabelText = showRoomLabel ? booking.room : '';
+              let badgeText = cleanLabel;
+              if (roomLabelText) {
+                badgeText = badgeText ? `${badgeText} · ${roomLabelText}` : roomLabelText;
+              }
+              card.innerHTML = `
+                <div class="appt-header-row">
+                  <div class="appt-title" title="${displayTitle}">${iconHtml}${displayTitle}</div>
+                  <div class="appt-time" title="${minutesToDisplayStr(startMin)} - ${minutesToDisplayStr(endMin)}${badgeText ? ' · ' + badgeText : ''}">
+                    ${minutesToCompactDisplayStr(startMin)} - ${minutesToCompactDisplayStr(endMin)}${badgeText ? ' · ' + badgeText : ''}
+                  </div>
+                </div>
+              `;
+            }
+          } else {
+            if (isPrivate) {
+              card.innerHTML = `
+                <div class="appt-header-row">
+                  <div class="appt-title">${displayTitle}</div>
+                  <div class="appt-time">${minutesToDisplayStr(startMin)} - ${minutesToDisplayStr(endMin)}</div>
+                </div>
+              `;
+            } else {
+              let cleanLabel = booking.purpose || '';
+              if (cleanLabel.toLowerCase() === 'other') {
+                cleanLabel = '';
+              }
+              const roomLabelText = showRoomLabel ? booking.room : '';
+              let badgeText = cleanLabel;
+              if (roomLabelText) {
+                badgeText = badgeText ? `${badgeText} · ${roomLabelText}` : roomLabelText;
+              }
+              card.innerHTML = `
+                <div class="appt-header-row">
+                  <div class="appt-title">${iconHtml}${displayTitle}</div>
+                  <div class="appt-time">${minutesToDisplayStr(startMin)} - ${minutesToDisplayStr(endMin)}</div>
+                </div>
+                ${badgeText ? `<div class="appt-badge">${badgeText}</div>` : ''}
+              `;
+            }
+          }
+          
+          card.addEventListener('click', (e) => {
+            e.stopPropagation();
+            openDetailsModal(booking.id);
+          });
+          
+          col.appendChild(card);
+        });
+      });
+    }
+
+    function scrollToDefaultTime() {
+      const viewport = document.getElementById('grid-viewport');
+      if (viewport) {
+        viewport.scrollTop = 9 * HOUR_HEIGHT;
+      }
+    }
+
+    function updateScheduler() {
+      // Synchronize mini calendar
+      miniCalCurrentMonth = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1);
+      renderMiniCalendar();
+      renderSchedulerGrid();
+    }
+
+    // -------------------------------------------------------------
+    // CONTROLS INTERACTIVE EVENT HANDLERS
+    // -------------------------------------------------------------
+    document.getElementById('prev-btn').addEventListener('click', () => {
+      if (currentView === 'daily') {
+        selectedDate.setDate(selectedDate.getDate() - 1);
+      } else if (currentView === 'weekly') {
+        selectedDate.setDate(selectedDate.getDate() - 7);
+      } else if (currentView === 'monthly') {
+        selectedDate.setMonth(selectedDate.getMonth() - 1);
+      }
+      updateScheduler();
+    });
+
+    document.getElementById('next-btn').addEventListener('click', () => {
+      if (currentView === 'daily') {
+        selectedDate.setDate(selectedDate.getDate() + 1);
+      } else if (currentView === 'weekly') {
+        selectedDate.setDate(selectedDate.getDate() + 7);
+      } else if (currentView === 'monthly') {
+        selectedDate.setMonth(selectedDate.getMonth() + 1);
+      }
+      updateScheduler();
+    });
+
+    document.getElementById('today-btn').addEventListener('click', () => {
+      selectedDate = new Date();
+      updateScheduler();
+    });
+
+    document.getElementById('refresh-btn').addEventListener('click', async () => {
+      const icon = document.getElementById('refresh-icon-svg');
+      if (icon) icon.classList.add('spinning-icon');
+      showToast('Syncing with Google Sheets...', 'success');
+      try {
+        await fetchBookingsFromSheets();
+      } finally {
+        if (icon) {
+          setTimeout(() => {
+            icon.classList.remove('spinning-icon');
+          }, 600);
+        }
+      }
+    });
+
+    // View toggles click
+    document.querySelectorAll('.view-tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.view-tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        
+        currentView = btn.getAttribute('data-view');
+        updateScheduler();
+        if (currentView !== 'monthly') {
+          scrollToDefaultTime();
+        }
+      });
+    });
+
+    // Search bar filter keyup
+    document.getElementById('search-input').addEventListener('keyup', (e) => {
+      searchQuery = e.target.value;
+      renderSchedulerGrid();
+    });
+
+    // -------------------------------------------------------------
+    // CURRENT TIME INDICATOR RED LINE
+    // -------------------------------------------------------------
+    function updateCurrentTimeLine() {
+      const line = document.getElementById('current-time-line');
+      const badge = document.getElementById('time-line-badge-content');
+      if (!line) return;
+
+      if (currentView === 'monthly') {
+        line.style.display = 'none';
+        return;
+      }
+
+      const now = new Date();
+      const todayStr = formatDateString(now);
+
+      if (currentView === 'daily') {
+        const activeStr = formatDateString(selectedDate);
+        if (todayStr !== activeStr) {
+          line.style.display = 'none';
+          return;
+        }
+      } else if (currentView === 'weekly') {
+        const startOfWeek = getStartOfWeek(selectedDate);
+        const endOfWeek = new Date(startOfWeek);
+        endOfWeek.setDate(startOfWeek.getDate() + 6);
+
+        const dateOnlyNow = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const dateOnlyStart = new Date(startOfWeek.getFullYear(), startOfWeek.getMonth(), startOfWeek.getDate());
+        const dateOnlyEnd = new Date(endOfWeek.getFullYear(), endOfWeek.getMonth(), endOfWeek.getDate());
+
+        if (dateOnlyNow < dateOnlyStart || dateOnlyNow > dateOnlyEnd) {
+          line.style.display = 'none';
+          return;
+        }
+      }
+
+      const hours = now.getHours();
+      const minutes = now.getMinutes();
+      const totalMinutes = hours * 60 + minutes;
+
+      const startMin = START_HOUR * 60; // 600 (10am)
+      const endMin = END_HOUR * 60;     // 1080 (6pm)
+
+      if (totalMinutes >= startMin && totalMinutes <= endMin) {
+        const topPx = (totalMinutes - startMin) * (HOUR_HEIGHT / MINS_IN_HOUR);
+        line.style.top = `${topPx}px`;
+        badge.innerText = minutesToDisplayStr(totalMinutes);
+        line.style.display = 'flex';
+      } else {
+        line.style.display = 'none';
+      }
+    }
+
+    // Refresh red line offset every 60 seconds
+    setInterval(updateCurrentTimeLine, 60000);
+
+    // -------------------------------------------------------------
+    // BOOKING FORM MODAL INTERACTION
+    // -------------------------------------------------------------
+    function openBookingModal(dateStr, startMins, roomId = '') {
+      currentSelectedDateStr = dateStr;
+      currentSelectedTimeMinutes = startMins;
+
+      const displayD = new Date(dateStr + 'T00:00:00');
+      const timeStr = minutesToDisplayStr(startMins);
+      const dateLabel = displayD.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+      document.getElementById('booking-modal-subtitle').innerText = `${dateLabel} · from ${timeStr}`;
+
+      // Reset form
+      document.getElementById('booking-form').reset();
+      
+      // Scroll modal body to top so Host details are always shown first
+      const modalBody = document.querySelector('#booking-modal-overlay .modal-body');
+      if (modalBody) {
+        modalBody.scrollTop = 0;
+      }
+      
+      // Reset conditional department visibility
+      document.getElementById('dept-specify-group').style.display = 'none';
+      document.getElementById('host-dept-specify').required = false;
+      
+      // Default duration selects
+      document.getElementById('duration-hours').value = 1;
+      document.getElementById('duration-minutes').value = 0;
+
+      // Handle pre-select dropdown room
+      const roomSelect = document.getElementById('booking-room');
+      if (roomId) {
+        roomSelect.value = roomId;
+        roomSelect.disabled = true; // lock resource inside Daily View column click
+      } else {
+        roomSelect.value = RESOURCES[0].id;
+        roomSelect.disabled = false;
+      }
+
+      document.getElementById('booking-modal-overlay').classList.add('active');
+    }
+
+    function closeBookingModal() {
+      document.getElementById('booking-modal-overlay').classList.remove('active');
+    }
+
+    document.getElementById('close-booking-modal-btn').addEventListener('click', closeBookingModal);
+    document.getElementById('cancel-booking-btn').addEventListener('click', closeBookingModal);
+
+    // Save/Submit Booking Form
+    document.getElementById('booking-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const hostFirstName = document.getElementById('host-first-name').value.trim();
+      const hostLastName = document.getElementById('host-last-name').value.trim();
+      const hostEmail = document.getElementById('host-email').value.trim();
+      const departmentSelect = document.getElementById('host-dept').value;
+      const deptSpecify = document.getElementById('host-dept-specify').value.trim();
+      const department = departmentSelect === 'Others' ? deptSpecify : departmentSelect;
+
+      const visitorName = document.getElementById('visitor-name').value.trim();
+      const visitorCompany = document.getElementById('visitor-company').value.trim();
+      const visitorEmail = document.getElementById('visitor-email').value.trim();
+
+      const numVisitorsInput = document.getElementById('num-visitors').value;
+      const numVisitors = parseInt(numVisitorsInput);
+      
+      const durationHours = parseInt(document.getElementById('duration-hours').value) || 0;
+      const durationMinutes = parseInt(document.getElementById('duration-minutes').value) || 0;
+      const durationMins = durationHours * 60 + durationMinutes;
+      
+      const purpose = document.getElementById('visit-purpose').value.trim();
+      const room = document.getElementById('booking-room').value;
+      const ceoApproval = document.getElementById('ceo-approval').value;
+      const foodRequirement = document.getElementById('food-requirement').value;
+      const eventVisibility = document.getElementById('event-visibility').value;
+      const remarks = document.getElementById('booking-remarks').value.trim();
+
+      // Client-side validations
+      if (!hostFirstName || !hostEmail || !departmentSelect || (departmentSelect === 'Others' && !deptSpecify) || !visitorName || !visitorCompany || !numVisitorsInput || !purpose || !room || !eventVisibility) {
+        showToast('Please fill in all required fields.', 'error');
+        return;
+      }
+
+      // Email format regex validation
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(hostEmail)) {
+        showToast('Please enter a valid Host Email address (e.g. name@company.com).', 'error');
+        return;
+      }
+      if (visitorEmail && !emailRegex.test(visitorEmail)) {
+        showToast('Please enter a valid Primary Visitor Mail Id.', 'error');
+        return;
+      }
+
+      if (durationMins <= 0) {
+        showToast('Duration must be greater than 0 minutes.', 'error');
+        return;
+      }
+
+      if (isNaN(numVisitors) || numVisitors <= 0 || !Number.isInteger(numVisitors)) {
+        showToast('Number of visitors must be a positive integer.', 'error');
+        return;
+      }
+
+      const startMin = currentSelectedTimeMinutes;
+      const endMin = startMin + durationMins;
+
+      if (endMin > END_HOUR * 60) {
+        showToast('Booking extends past operating hours (6:00 PM).', 'error');
+        return;
+      }
+
+      // Check slot overlap for this room
+      if (checkOverlap(room, currentSelectedDateStr, startMin, endMin)) {
+        showToast('Room is already booked during this time slot.', 'error');
+        return;
+      }
+
+      // Prepare payload with clean, unshifted keys matching the Google Sheets columns
+      const timeStr = minutesToTimeStr(startMin);
+      const payload = {
+        bookingDate: currentSelectedDateStr,
+        slotTime: timeStr,
+        hostFirstName: hostFirstName,
+        hostLastName: hostLastName,
+        hostEmail: hostEmail,
+        department: department,
+        visitorName: visitorName,
+        visitorCompany: visitorCompany,
+        visitorEmail: visitorEmail,
+        numVisitors: numVisitors,
+        duration: durationMins,
+        purpose: purpose,
+        roomTable: room,
+        priority: 'Medium',
+        status: ceoApproval === 'No' ? 'confirmed' : 'pending',
+        ceoApproval: ceoApproval,
+        foodRequirement: foodRequirement,
+        eventVisibility: eventVisibility,
+        remarks: remarks
+      };
+
+      const submitBtn = document.querySelector('#booking-form button[type="submit"]');
+      const originalBtnText = submitBtn.innerText;
+      
+      // Loading State
+      submitBtn.disabled = true;
+      submitBtn.innerText = "Booking...";
+
+      try {
+        // Send POST to Apps Script using no-cors
+        await fetch(SHEETS_WEB_APP_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(payload)
+        });
+
+        // Since no-cors hides response, we assume success
+        showToast('Booking successfully saved', 'success');
+        closeBookingModal();
+        
+        // Fetch fresh data and reload calendar (forcing cache bypass)
+        await fetchBookingsFromSheets(true);
+      } catch (err) {
+        console.error("Booking post error:", err);
+        showToast('Failed to save booking. Please try again.', 'error');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerText = originalBtnText;
+      }
+    });
+
+    // -------------------------------------------------------------
+    // DETAILS MODAL INTERACTION
+    // -------------------------------------------------------------
+    function openDetailsModal(id) {
+      const booking = bookings.find(b => b.id === id);
+      if (!booking) return;
+
+      viewingBookingId = id;
+
+      const displayD = new Date(booking.date + 'T00:00:00');
+      const dateStr = displayD.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+      const startMin = timeStrToMinutes(booking.startTime);
+      const endMin = timeStrToMinutes(booking.endTime);
+      const timeRangeStr = `${minutesToDisplayStr(startMin)} - ${minutesToDisplayStr(endMin)}`;
+
+      document.getElementById('details-modal-subtitle').innerText = 
+        `${booking.room} · ${dateStr} · ${timeRangeStr}`;
+
+      const isPrivate = isBookingPrivate(booking);
+
+      if (isPrivate) {
+        document.getElementById('details-modal-title').innerText = "Private Booking";
+        document.getElementById('details-public-body').style.display = 'none';
+        document.getElementById('details-private-body').style.display = 'block';
+        document.getElementById('det-private-time').innerText = timeRangeStr;
+      } else {
+        document.getElementById('details-modal-title').innerText = "Booking Details";
+        document.getElementById('details-public-body').style.display = 'block';
+        document.getElementById('details-private-body').style.display = 'none';
+
+        // Setup labels values
+        document.getElementById('det-visitor-name').innerText = booking.visitorName;
+        document.getElementById('det-visitor-company').innerText = booking.visitorCompany;
+        document.getElementById('det-visitor-email').innerText = booking.visitorEmail || '-';
+        document.getElementById('det-num-visitors').innerText = booking.numVisitors;
+        document.getElementById('det-purpose').innerText = booking.purpose;
+
+        document.getElementById('det-host-name').innerText = `${booking.hostFirstName} ${booking.hostLastName}`.trim();
+        document.getElementById('det-host-dept').innerText = booking.department;
+        document.getElementById('det-host-email').innerText = booking.hostEmail;
+
+        // Status Badge
+        const statusBadge = document.getElementById('det-status-badge');
+        statusBadge.className = `badge ${booking.status}`;
+        if (booking.status === 'confirmed') statusBadge.innerText = 'Confirmed';
+        if (booking.status === 'pending') statusBadge.innerText = 'Pending';
+        if (booking.status === 'escalated') statusBadge.innerText = 'Escalated to CEO';
+
+        // Visibility Label
+        document.getElementById('det-visibility').innerText = booking.eventVisibility || 'Public';
+
+        // CEO Approval Label
+        document.getElementById('det-ceo-approval').innerText = booking.ceoApproval || 'No';
+
+        // Food Requirement Label
+        document.getElementById('det-food-requirement').innerText = booking.foodRequirement || '-';
+
+        // Remarks Label
+        document.getElementById('det-remarks').innerText = booking.remarks || '-';
+      }
+
+      document.getElementById('details-modal-overlay').classList.add('active');
+    }
+
+    function closeDetailsModal() {
+      document.getElementById('details-modal-overlay').classList.remove('active');
+      viewingBookingId = null;
+    }
+
+    document.getElementById('close-details-modal-btn').addEventListener('click', closeDetailsModal);
+    document.getElementById('close-details-btn').addEventListener('click', closeDetailsModal);
+
+    // Cancel / Delete booking
+    document.getElementById('det-delete-btn').addEventListener('click', async () => {
+      if (!viewingBookingId) return;
+      if (confirm('Are you sure you want to delete this booking?')) {
+        const booking = bookings.find(b => b.id === viewingBookingId);
+        
+        // Clear local storage cache
+        localStorage.removeItem("visitorflow_bookings_parsed_v2");
+        localStorage.removeItem("visitorflow_bookings_timestamp_v2");
+
+        // Optimistically remove from local state
+        bookings = bookings.filter(b => b.id !== viewingBookingId);
+        renderSchedulerGrid();
+        closeDetailsModal();
+        showToast('Booking deleted locally', 'success');
+
+        // If the booking is backed by a Google Sheets record, send deletion request
+        if (booking && typeof booking.id === 'string' && booking.id.includes('T')) {
+          try {
+            await fetch(SHEETS_WEB_APP_URL, {
+              method: 'POST',
+              mode: 'no-cors',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                action: 'delete',
+                timestamp: booking.id,
+                bookingDate: booking.date,
+                slotTime: booking.startTime,
+                hostFirstName: booking.hostFirstName,
+                visitorName: booking.visitorName
+              })
+            });
+            showToast('Booking deleted from Google Sheets', 'success');
+            // Fetch fresh data and reload calendar
+            await fetchBookingsFromSheets(true);
+          } catch (err) {
+            console.error("Sheets deletion error:", err);
+            showToast('Failed to delete booking from Google Sheets.', 'error');
+          }
+        }
+      }
+    });
+
+    // Confirm and Escalate event listeners removed
+
+    // -------------------------------------------------------------
+    // --- Google Sheets Integration ---
+    // -------------------------------------------------------------
+    const SHEETS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbykMVG2fwoewbxnYfXahCM1C5P_RUUInTeooShu1C4HO7kxcU5YMnVi1HGWwJEjqc4JKQ/exec";
+
+    function parseSheetTime(timeStr) {
+      if (!timeStr) return "10:00";
+      timeStr = String(timeStr).trim();
+      if (timeStr.includes('T')) {
+        const d = new Date(timeStr);
+        const localMins = d.getHours() * 60 + d.getMinutes();
+        const roundedMins = Math.round(localMins / 30) * 30;
+        const hh = String(Math.floor(roundedMins / 60)).padStart(2, '0');
+        const mm = String(roundedMins % 60).padStart(2, '0');
+        return `${hh}:${mm}`;
+      }
+      const isPM = /pm/i.test(timeStr);
+      const isAM = /am/i.test(timeStr);
+      const cleanTime = timeStr.replace(/[ap]m/i, '').trim();
+      const parts = cleanTime.split(':');
+      let hours = parseInt(parts[0], 10);
+      let minutes = parts[1] ? parseInt(parts[1], 10) : 0;
+      if (isNaN(hours)) hours = 10;
+      if (isNaN(minutes)) minutes = 0;
+      if (isPM && hours < 12) {
+        hours += 12;
+      } else if (isAM && hours === 12) {
+        hours = 0;
+      }
+      const hh = String(hours).padStart(2, '0');
+      const mm = String(minutes).padStart(2, '0');
+      return `${hh}:${mm}`;
+    }
+
+    async function fetchBookingsFromSheets(forceRefresh = false) {
+      const CACHE_KEY = "visitorflow_bookings_parsed_v2";
+      const CACHE_TIME_KEY = "visitorflow_bookings_timestamp_v2";
+
+      const now = Date.now();
+      const cachedData = localStorage.getItem(CACHE_KEY);
+
+      // 1. Render from cache immediately if present (under 50ms)
+      let loadedFromCache = false;
+      if (cachedData) {
+        try {
+          bookings = JSON.parse(cachedData);
+          renderSchedulerGrid();
+          loadedFromCache = true;
+        } catch (e) {
+          console.error("Cache parse failed, will wait for fresh fetch", e);
+        }
+      }
+
+      // 2. Fetch fresh bookings from Google Sheets in the background
+      try {
+        const fetchUrl = `${SHEETS_WEB_APP_URL}?_cb=${now}`;
+        const response = await fetch(fetchUrl);
+        if (!response.ok) throw new Error("Network response was not ok");
+        const data = await response.json();
+        
+        // Parse sheet records into our local calendar format
+        const freshBookings = data.map(record => {
+          let parsedDateStr = '';
+          if (record['Booking Date']) {
+            const d = parseDateSafely(record['Booking Date']);
+            const year = d.getFullYear();
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            parsedDateStr = `${year}-${month}-${day}`;
+          } else {
+            parsedDateStr = formatDateString(new Date());
+          }
+          
+          const parsedStartTime = parseSheetTime(record['Slot Time']);
+          const startMins = timeStrToMinutes(parsedStartTime);
+          const durationMins = parseInt(record['Duration']) || 60;
+          const endMins = startMins + durationMins;
+          const parsedEndTime = minutesToTimeStr(endMins);
+
+          // Priority validation
+          let priority = record['Priority'] || 'Medium';
+          if (priority !== 'Critical' && priority !== 'Medium' && priority !== 'Low') {
+            priority = 'Medium';
+          }
+
+          // Status validation
+          let status = record['Status'] || 'confirmed';
+          const cleanStatus = String(status).trim().toLowerCase();
+          if (cleanStatus === 'pending') {
+            status = 'pending';
+          } else if (cleanStatus === 'meet') {
+            status = 'meet';
+          } else if (cleanStatus === 'escalated') {
+            status = 'escalated';
+          } else {
+            status = 'confirmed'; // maps 'confirmed', 'approved', etc. to standard green
+          }
+
+          return {
+            id: record.Timestamp || (Date.now() + Math.random()),
+            date: parsedDateStr,
+            room: record['Room/Table'] || 'Room 1',
+            startTime: parsedStartTime,
+            endTime: parsedEndTime,
+            hostFirstName: record['Host First Name'] || '',
+            hostLastName: record['Host Last Name'] || '',
+            hostEmail: record['Host Official Email'] || '',
+            department: record['Department'] || '',
+            visitorName: record['Visitor Name'] || '',
+            visitorCompany: record['Visitor Company'] || '',
+            visitorEmail: record['Visitor Email'] || '',
+            numVisitors: parseInt(record['No. of Visitors']) || 1,
+            purpose: record['Purpose of Visit'] || '',
+            priority: priority,
+            status: status,
+            ceoApproval: record['Need CEO Approval?'] || 'No',
+            foodRequirement: record['Food Requirement'] || '',
+            eventVisibility: record['Event Visibility'] || record[''] || 'Public',
+            remarks: record['Remarks'] || ''
+          };
+        });
+
+        // Store to cache
+        localStorage.setItem(CACHE_KEY, JSON.stringify(freshBookings));
+        localStorage.setItem(CACHE_TIME_KEY, now.toString());
+
+        // Update working state and redraw grid silently
+        bookings = freshBookings;
+        renderSchedulerGrid();
+      } catch (error) {
+        console.error("Error background-fetching bookings:", error);
+        // Only show error toast if we didn't even have cached data to show
+        if (!loadedFromCache) {
+          showToast("Failed to fetch bookings from Google Sheets.", "error");
+        }
+      }
+    }
+
+    // -------------------------------------------------------------
+    // INIT APPLICATION LOAD
+    // -------------------------------------------------------------
+    window.addEventListener('DOMContentLoaded', () => {
+      initSampleBookings();
+      renderTimeColumn();
+      updateScheduler();
+
+      // Populate Hours Dropdown (0 - 24)
+      const hoursSelect = document.getElementById('duration-hours');
+      if (hoursSelect) {
+        hoursSelect.innerHTML = '';
+        for (let h = 0; h <= 24; h++) {
+          const opt = document.createElement('option');
+          opt.value = h;
+          opt.innerText = `${h} hr${h !== 1 ? 's' : ''}`;
+          if (h === 1) opt.selected = true; // default 1 hour
+          hoursSelect.appendChild(opt);
+        }
+      }
+
+      // Populate Minutes Dropdown (0 - 60)
+      const minutesSelect = document.getElementById('duration-minutes');
+      if (minutesSelect) {
+        minutesSelect.innerHTML = '';
+        for (let m = 0; m <= 60; m += 5) {
+          const opt = document.createElement('option');
+          opt.value = m;
+          opt.innerText = `${m} min${m !== 1 ? 's' : ''}`;
+          if (m === 0) opt.selected = true;
+          minutesSelect.appendChild(opt);
+        }
+      }
+
+      // Department Conditional Toggle
+      const deptSelect = document.getElementById('host-dept');
+      if (deptSelect) {
+        deptSelect.addEventListener('change', function() {
+          const specifyGroup = document.getElementById('dept-specify-group');
+          const specifyInput = document.getElementById('host-dept-specify');
+          if (this.value === 'Others') {
+            specifyGroup.style.display = 'block';
+            specifyInput.required = true;
+          } else {
+            specifyGroup.style.display = 'none';
+            specifyInput.required = false;
+            specifyInput.value = '';
+          }
+        });
+      }
+
+      // Fetch bookings from sheets on page load
+      fetchBookingsFromSheets();
+
+      // Poll for updates every 10 seconds to automatically update approval status & calendar events
+      setInterval(fetchBookingsFromSheets, 10000);
+
+      // Position red line immediately
+      setTimeout(updateCurrentTimeLine, 100);
+
+      // Scroll to 9:00 AM on initial load
+      scrollToDefaultTime();
+      setTimeout(scrollToDefaultTime, 100);
+    });
+  </script>
+</body>
+</html>

@@ -2892,9 +2892,23 @@
         
         // Parse sheet records into our local calendar format
         const freshBookings = data.map(record => {
+          // Helper to find a value in a record by matching keys case-insensitively and ignoring surrounding whitespace
+          const getValue = (keys) => {
+            for (let rKey in record) {
+              const cleanRKey = rKey.trim().toLowerCase();
+              for (let key of keys) {
+                if (cleanRKey === key.toLowerCase().trim()) {
+                  return record[rKey];
+                }
+              }
+            }
+            return '';
+          };
+
           let parsedDateStr = '';
-          if (record['Booking Date']) {
-            const d = parseDateSafely(record['Booking Date']);
+          const bookingDateVal = getValue(['Booking Date', 'Appointment Date']);
+          if (bookingDateVal) {
+            const d = parseDateSafely(bookingDateVal);
             const year = d.getFullYear();
             const month = String(d.getMonth() + 1).padStart(2, '0');
             const day = String(d.getDate()).padStart(2, '0');
@@ -2903,20 +2917,24 @@
             parsedDateStr = formatDateString(new Date());
           }
           
-          const parsedStartTime = parseSheetTime(record['Slot Time']);
+          const slotTimeVal = getValue(['Slot Time']);
+          const parsedStartTime = parseSheetTime(slotTimeVal);
           const startMins = timeStrToMinutes(parsedStartTime);
-          const durationMins = parseInt(record['Duration']) || 60;
+          const durationVal = getValue(['Duration']);
+          const durationMins = parseInt(durationVal) || 60;
           const endMins = startMins + durationMins;
           const parsedEndTime = minutesToTimeStr(endMins);
 
           // Priority validation
-          let priority = record['Priority'] || 'Medium';
+          let priorityVal = getValue(['Priority']) || 'Medium';
+          let priority = priorityVal;
           if (priority !== 'Critical' && priority !== 'Medium' && priority !== 'Low') {
             priority = 'Medium';
           }
 
           // Status validation
-          let status = record['Status'] || 'confirmed';
+          let statusVal = getValue(['Status']) || 'confirmed';
+          let status = statusVal;
           const cleanStatus = String(status).trim().toLowerCase();
           if (cleanStatus === 'pending') {
             status = 'pending';
@@ -2929,26 +2947,26 @@
           }
 
           return {
-            id: record.Timestamp || (Date.now() + Math.random()),
+            id: getValue(['Timestamp', 'Booking Made On']) || (Date.now() + Math.random()),
             date: parsedDateStr,
-            room: record['Room/Table'] || 'Room 1',
+            room: getValue(['Room/Table', 'Room / Table', 'Room']) || 'Room 1',
             startTime: parsedStartTime,
             endTime: parsedEndTime,
-            hostFirstName: record['Host First Name'] || '',
-            hostLastName: record['Host Last Name'] || '',
-            hostEmail: record['Host Official Email'] || '',
-            department: record['Department'] || '',
-            visitorName: record['Visitor Name'] || '',
-            visitorCompany: record['Visitor Company'] || '',
-            visitorEmail: record['Visitor Email'] || '',
-            numVisitors: parseInt(record['No. of Visitors']) || 1,
-            purpose: record['Purpose of Visit'] || '',
+            hostFirstName: getValue(['Host First Name']) || '',
+            hostLastName: getValue(['Host Last Name']) || '',
+            hostEmail: getValue(['Host Official Email', 'Host Email']) || '',
+            department: getValue(['Department']) || '',
+            visitorName: getValue(['Visitor Name']) || '',
+            visitorCompany: getValue(['Visitor Company', 'Company']) || '',
+            visitorEmail: getValue(['Visitor Email']) || '',
+            numVisitors: parseInt(getValue(['No. of Visitors', 'No.of Visitors'])) || 1,
+            purpose: getValue(['Purpose of Visit', 'Purpose']) || '',
             priority: priority,
             status: status,
-            ceoApproval: record['Need CEO Approval?'] || 'No',
-            foodRequirement: record['Food Requirement'] || '',
-            eventVisibility: record['Event Visibility'] || record[''] || 'Public',
-            remarks: record['Remarks'] || ''
+            ceoApproval: getValue(['CEO Approval', 'Need CEO Approval?']) || 'No',
+            foodRequirement: getValue(['Food Requirement?', 'Food Requirement', 'Food']) || '',
+            eventVisibility: getValue(['Event Visibility', 'Visibility']) || 'Public',
+            remarks: getValue(['Remarks']) || ''
           };
         });
 

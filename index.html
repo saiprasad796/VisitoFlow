@@ -1296,6 +1296,107 @@
     .spinning-icon {
       animation: spin-refresh 0.8s linear infinite;
     }
+
+    /* Shake animation for invalid code */
+    @keyframes modal-shake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-6px); }
+      40%, 80% { transform: translateX(6px); }
+    }
+    .modal-card.shake {
+      animation: modal-shake 0.3s ease-in-out;
+    }
+    
+    /* Code input styles */
+    .delete-code-digit:focus {
+      border-color: #ef4444 !important;
+      box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
+    }
+
+    /* Header Info Actions & Popovers */
+    .header-info-actions {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+    .info-action-wrapper {
+      position: relative;
+    }
+    .info-action-btn {
+      background-color: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 14px;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--secondary);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.15s ease;
+    }
+    .info-action-btn:hover {
+      background-color: #f8fafc;
+      border-color: var(--muted);
+      color: var(--primary);
+    }
+    .info-action-btn.active {
+      background-color: #f1f5f9;
+      border-color: var(--accent-blue);
+      color: var(--accent-blue);
+    }
+    .header-info-dropdown {
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      width: 280px;
+      background-color: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      z-index: 50;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(-8px);
+      transition: opacity 0.2s ease, transform 0.2s ease;
+      padding: 16px;
+    }
+    .header-info-dropdown.active {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0);
+    }
+    .dropdown-header {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--primary);
+      margin-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 6px;
+    }
+    .dropdown-body {
+      font-size: 12px;
+      line-height: 1.5;
+      color: var(--secondary);
+    }
+    .support-list {
+      margin-top: 8px;
+      padding-left: 16px;
+      list-style-type: decimal;
+    }
+    .support-list li {
+      margin-bottom: 6px;
+    }
+    .support-list a {
+      color: var(--accent-blue);
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .support-list a:hover {
+      text-decoration: underline;
+    }
   </style>
 </head>
 <body>
@@ -1356,6 +1457,39 @@
       <!-- Top Title Header -->
       <div class="main-header">
         <h1 class="main-title"><span style="color: #0f172a;">Visitor</span><span style="color: #2563eb;">Flow</span></h1>
+        
+        <!-- About & Help Actions -->
+        <div class="header-info-actions">
+          <div class="info-action-wrapper">
+            <button class="info-action-btn" id="about-toggle-btn" title="About VisitorFlow">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+              <span>About</span>
+            </button>
+            <div class="header-info-dropdown" id="about-dropdown">
+              <div class="dropdown-header">About VisitorFlow</div>
+              <div class="dropdown-body">
+                VisitorFlow is Kaynes Circuits' in-house visitor and meeting space booking system, built to make scheduling rooms and tables across the office simple and transparent.
+              </div>
+            </div>
+          </div>
+
+          <div class="info-action-wrapper">
+            <button class="info-action-btn" id="help-toggle-btn" title="Help & Support">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/><circle cx="12" cy="12" r="10"/></svg>
+              <span>Help</span>
+            </button>
+            <div class="header-info-dropdown" id="help-dropdown">
+              <div class="dropdown-header">Help & Support</div>
+              <div class="dropdown-body">
+                For further assistance or guidance, please contact:
+                <ul class="support-list">
+                  <li><a href="mailto:ks.lachna@kaynescircuits.com">ks.lachna@kaynescircuits.com</a></li>
+                  <li><a href="mailto:o.nishesh@kaynescircuits.com">o.nishesh@kaynescircuits.com</a></li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- Controls Sub-Bar -->
@@ -1679,6 +1813,39 @@
       <div class="modal-footer" id="details-modal-footer">
         <button type="button" class="btn btn-danger-outline" id="det-delete-btn">Delete Booking</button>
         <button type="button" class="btn btn-ghost" id="close-details-btn">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DELETE CONFIRMATION MODAL -->
+  <div class="modal-overlay" id="delete-confirm-modal-overlay">
+    <div class="modal-card" style="width: 400px;">
+      <div class="modal-header" style="border-bottom: none; padding-bottom: 0;">
+        <div class="modal-title-wrapper">
+          <div class="modal-title" style="color: #ef4444; font-size: 18px; display: flex; align-items: center; gap: 8px;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-alert-triangle"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            Delete Booking
+          </div>
+        </div>
+        <button class="close-btn" id="close-delete-confirm-modal-btn">&times;</button>
+      </div>
+      <div class="modal-body" style="padding-top: 12px; padding-bottom: 12px;">
+        <p style="font-size: 14px; color: var(--secondary); margin-bottom: 16px;">Are you sure you want to delete this booking? Please enter the 4-digit deletion code to confirm.</p>
+        
+        <div class="form-group" style="margin-bottom: 8px;">
+          <label style="font-size: 11px; letter-spacing: 0.05em; font-weight: 700; margin-bottom: 8px; color: var(--secondary);">4-Digit Confirmation Code</label>
+          <div style="display: flex; gap: 10px; justify-content: center; margin-top: 8px; margin-bottom: 8px;">
+            <input type="text" maxlength="1" class="delete-code-digit" style="width: 50px; height: 50px; text-align: center; font-size: 24px; font-weight: 700; border-radius: 8px; border: 1px solid var(--border); background-color: var(--white); outline: none; transition: border-color 0.15s;" pattern="[0-9]*" inputmode="numeric">
+            <input type="text" maxlength="1" class="delete-code-digit" style="width: 50px; height: 50px; text-align: center; font-size: 24px; font-weight: 700; border-radius: 8px; border: 1px solid var(--border); background-color: var(--white); outline: none; transition: border-color 0.15s;" pattern="[0-9]*" inputmode="numeric">
+            <input type="text" maxlength="1" class="delete-code-digit" style="width: 50px; height: 50px; text-align: center; font-size: 24px; font-weight: 700; border-radius: 8px; border: 1px solid var(--border); background-color: var(--white); outline: none; transition: border-color 0.15s;" pattern="[0-9]*" inputmode="numeric">
+            <input type="text" maxlength="1" class="delete-code-digit" style="width: 50px; height: 50px; text-align: center; font-size: 24px; font-weight: 700; border-radius: 8px; border: 1px solid var(--border); background-color: var(--white); outline: none; transition: border-color 0.15s;" pattern="[0-9]*" inputmode="numeric">
+          </div>
+          <div id="delete-code-error" style="color: #ef4444; font-size: 12px; font-weight: 600; text-align: center; margin-top: 6px; min-height: 18px; visibility: hidden;">Invalid code. Please try again.</div>
+        </div>
+      </div>
+      <div class="modal-footer" style="background-color: #f8fafc; border-top: none;">
+        <button type="button" class="btn btn-ghost" id="cancel-delete-confirm-btn">Cancel</button>
+        <button type="button" class="btn btn-primary" id="confirm-delete-btn" style="background-color: #ef4444;" disabled>Delete</button>
       </div>
     </div>
   </div>
@@ -2784,11 +2951,108 @@
     document.getElementById('close-details-btn').addEventListener('click', closeDetailsModal);
 
     // Cancel / Delete booking
-    document.getElementById('det-delete-btn').addEventListener('click', async () => {
+    const deleteConfirmModal = document.getElementById('delete-confirm-modal-overlay');
+    const deleteCodeDigits = Array.from(document.querySelectorAll('.delete-code-digit'));
+    const deleteCodeError = document.getElementById('delete-code-error');
+    const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
+    const cancelDeleteBtn = document.getElementById('cancel-delete-confirm-btn');
+    const closeDeleteModalBtn = document.getElementById('close-delete-confirm-modal-btn');
+    const deleteCard = deleteConfirmModal.querySelector('.modal-card');
+
+    function openDeleteConfirmModal() {
+      // Clear inputs
+      deleteCodeDigits.forEach(input => input.value = '');
+      deleteCodeError.style.visibility = 'hidden';
+      confirmDeleteBtn.disabled = true;
+      deleteCard.classList.remove('shake');
+      deleteConfirmModal.classList.add('active');
+      // Focus first digit
+      setTimeout(() => deleteCodeDigits[0].focus(), 100);
+    }
+
+    function closeDeleteConfirmModal() {
+      deleteConfirmModal.classList.remove('active');
+    }
+
+    function validateCodeInputs() {
+      const allFilled = deleteCodeDigits.every(input => /^\d$/.test(input.value));
+      confirmDeleteBtn.disabled = !allFilled;
+    }
+
+    // Auto-tab and validation logic for digit inputs
+    deleteCodeDigits.forEach((input, index) => {
+      // Handle typing digits
+      input.addEventListener('input', (e) => {
+        const value = e.target.value;
+        // Keep only the last character entered, and only if it's a digit
+        if (value && !/^\d$/.test(value)) {
+          input.value = '';
+          return;
+        }
+
+        // If entered a digit, move focus to the next field
+        if (value) {
+          if (index < deleteCodeDigits.length - 1) {
+            deleteCodeDigits[index + 1].focus();
+          }
+        }
+        
+        validateCodeInputs();
+      });
+
+      // Handle backspace/navigation keys
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Backspace') {
+          // If the current input is empty, focus the previous one and clear it
+          if (!input.value && index > 0) {
+            deleteCodeDigits[index - 1].focus();
+            deleteCodeDigits[index - 1].value = '';
+            validateCodeInputs();
+          }
+        } else if (e.key === 'Enter') {
+          if (!confirmDeleteBtn.disabled) {
+            handleDeleteConfirm();
+          }
+        }
+      });
+
+      // Handle paste of the full code
+      input.addEventListener('paste', (e) => {
+        e.preventDefault();
+        const pasteData = (e.clipboardData || window.clipboardData).getData('text');
+        if (/^\d{4}$/.test(pasteData)) {
+          for (let i = 0; i < 4; i++) {
+            deleteCodeDigits[i].value = pasteData[i];
+          }
+          deleteCodeDigits[3].focus();
+          validateCodeInputs();
+        }
+      });
+    });
+
+    document.getElementById('det-delete-btn').addEventListener('click', () => {
       if (!viewingBookingId) return;
-      if (confirm('Are you sure you want to delete this booking?')) {
+      openDeleteConfirmModal();
+    });
+
+    cancelDeleteBtn.addEventListener('click', closeDeleteConfirmModal);
+    closeDeleteModalBtn.addEventListener('click', closeDeleteConfirmModal);
+
+    // Clicking overlay also closes modal
+    deleteConfirmModal.addEventListener('click', (e) => {
+      if (e.target === deleteConfirmModal) {
+        closeDeleteConfirmModal();
+      }
+    });
+
+    async function handleDeleteConfirm() {
+      const code = deleteCodeDigits.map(input => input.value).join('');
+      if (code === '2224') {
         const booking = bookings.find(b => b.id === viewingBookingId);
         
+        closeDeleteConfirmModal();
+        closeDetailsModal();
+
         // Clear local storage cache
         localStorage.removeItem("visitorflow_bookings_parsed_v2");
         localStorage.removeItem("visitorflow_bookings_timestamp_v2");
@@ -2796,7 +3060,6 @@
         // Optimistically remove from local state
         bookings = bookings.filter(b => b.id !== viewingBookingId);
         renderSchedulerGrid();
-        closeDetailsModal();
         showToast('Booking deleted locally', 'success');
 
         // If the booking is backed by a Google Sheets record, send deletion request
@@ -2825,10 +3088,67 @@
             showToast('Failed to delete booking from Google Sheets.', 'error');
           }
         }
+      } else {
+        // Shaking micro-animation
+        deleteCard.classList.remove('shake');
+        // trigger reflow
+        void deleteCard.offsetWidth;
+        deleteCard.classList.add('shake');
+        
+        // Show error message
+        deleteCodeError.style.visibility = 'visible';
+        
+        // Clear all fields and focus the first one
+        deleteCodeDigits.forEach(input => input.value = '');
+        confirmDeleteBtn.disabled = true;
+        deleteCodeDigits[0].focus();
       }
-    });
+    }
+
+    confirmDeleteBtn.addEventListener('click', handleDeleteConfirm);
 
     // Confirm and Escalate event listeners removed
+
+    // About & Help Toggles
+    const aboutToggleBtn = document.getElementById('about-toggle-btn');
+    const aboutDropdown = document.getElementById('about-dropdown');
+    const helpToggleBtn = document.getElementById('help-toggle-btn');
+    const helpDropdown = document.getElementById('help-dropdown');
+
+    function toggleAboutDropdown(e) {
+      e.stopPropagation();
+      const isActive = aboutDropdown.classList.contains('active');
+      closeAllDropdowns();
+      if (!isActive) {
+        aboutDropdown.classList.add('active');
+        aboutToggleBtn.classList.add('active');
+      }
+    }
+
+    function toggleHelpDropdown(e) {
+      e.stopPropagation();
+      const isActive = helpDropdown.classList.contains('active');
+      closeAllDropdowns();
+      if (!isActive) {
+        helpDropdown.classList.add('active');
+        helpToggleBtn.classList.add('active');
+      }
+    }
+
+    function closeAllDropdowns() {
+      if (aboutDropdown) aboutDropdown.classList.remove('active');
+      if (aboutToggleBtn) aboutToggleBtn.classList.remove('active');
+      if (helpDropdown) helpDropdown.classList.remove('active');
+      if (helpToggleBtn) helpToggleBtn.classList.remove('active');
+    }
+
+    if (aboutToggleBtn) aboutToggleBtn.addEventListener('click', toggleAboutDropdown);
+    if (helpToggleBtn) helpToggleBtn.addEventListener('click', toggleHelpDropdown);
+
+    if (aboutDropdown) aboutDropdown.addEventListener('click', (e) => e.stopPropagation());
+    if (helpDropdown) helpDropdown.addEventListener('click', (e) => e.stopPropagation());
+
+    document.addEventListener('click', closeAllDropdowns);
 
     // -------------------------------------------------------------
     // --- Google Sheets Integration ---

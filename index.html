@@ -1489,6 +1489,22 @@
               </div>
             </div>
           </div>
+
+          <div class="info-action-wrapper">
+            <button class="info-action-btn" id="feedback-toggle-btn" title="Give Feedback">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              <span>Feedback</span>
+            </button>
+            <div class="header-info-dropdown" id="feedback-dropdown" style="min-width: 260px;">
+              <div class="dropdown-header">Feedback & Suggestions</div>
+              <div class="dropdown-body">
+                <form id="feedback-form" style="display: flex; flex-direction: column; gap: 10px; margin-top: 5px;">
+                  <textarea id="feedback-text" required placeholder="Help us improve. Share your suggestions..." style="border: 1px solid var(--border); border-radius: 6px; padding: 10px 12px; font-family: inherit; font-size: 13px; color: var(--primary); outline: none; background-color: var(--white); transition: border-color 0.15s; resize: vertical; min-height: 80px;"></textarea>
+                  <button type="submit" class="btn btn-primary" id="feedback-submit-btn" style="font-size: 12px; padding: 8px 16px; align-self: flex-end;">Submit Feedback</button>
+                </form>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -1901,6 +1917,19 @@
       const mm = String(date.getMonth() + 1).padStart(2, '0');
       const dd = String(date.getDate()).padStart(2, '0');
       return `${yyyy}-${mm}-${dd}`;
+    }
+
+    async function getClientIP() {
+      try {
+        const response = await fetch('https://api.ipify.org?format=json');
+        if (response.ok) {
+          const data = await response.json();
+          return data.ip || 'Unknown';
+        }
+      } catch (err) {
+        console.error("Error fetching IP:", err);
+      }
+      return 'Unknown';
     }
 
     function parseDateSafely(dateInput) {
@@ -2858,6 +2887,9 @@
       submitBtn.innerText = "Booking...";
 
       try {
+        const clientIP = await getClientIP();
+        payload.ipAddress = clientIP;
+
         // Send POST to Apps Script using no-cors
         await fetch(SHEETS_WEB_APP_URL, {
           method: 'POST',
@@ -3070,6 +3102,7 @@
         // If the booking is backed by a Google Sheets record, send deletion request
         if (booking && typeof booking.id === 'string' && booking.id.includes('T')) {
           try {
+            const clientIP = await getClientIP();
             await fetch(SHEETS_WEB_APP_URL, {
               method: 'POST',
               mode: 'no-cors',
@@ -3082,7 +3115,8 @@
                 bookingDate: booking.date,
                 slotTime: booking.startTime,
                 hostFirstName: booking.hostFirstName,
-                visitorName: booking.visitorName
+                visitorName: booking.visitorName,
+                ipAddress: clientIP
               })
             });
             showToast('Booking deleted from Google Sheets', 'success');
@@ -3114,11 +3148,16 @@
 
     // Confirm and Escalate event listeners removed
 
-    // About & Help Toggles
+    // About, Help & Feedback Toggles
     const aboutToggleBtn = document.getElementById('about-toggle-btn');
     const aboutDropdown = document.getElementById('about-dropdown');
     const helpToggleBtn = document.getElementById('help-toggle-btn');
     const helpDropdown = document.getElementById('help-dropdown');
+    const feedbackToggleBtn = document.getElementById('feedback-toggle-btn');
+    const feedbackDropdown = document.getElementById('feedback-dropdown');
+    const feedbackForm = document.getElementById('feedback-form');
+    const feedbackText = document.getElementById('feedback-text');
+    const feedbackSubmitBtn = document.getElementById('feedback-submit-btn');
 
     function toggleAboutDropdown(e) {
       e.stopPropagation();
@@ -3140,18 +3179,68 @@
       }
     }
 
+    function toggleFeedbackDropdown(e) {
+      e.stopPropagation();
+      const isActive = feedbackDropdown.classList.contains('active');
+      closeAllDropdowns();
+      if (!isActive) {
+        feedbackDropdown.classList.add('active');
+        feedbackToggleBtn.classList.add('active');
+        feedbackText.focus();
+      }
+    }
+
     function closeAllDropdowns() {
       if (aboutDropdown) aboutDropdown.classList.remove('active');
       if (aboutToggleBtn) aboutToggleBtn.classList.remove('active');
       if (helpDropdown) helpDropdown.classList.remove('active');
       if (helpToggleBtn) helpToggleBtn.classList.remove('active');
+      if (feedbackDropdown) feedbackDropdown.classList.remove('active');
+      if (feedbackToggleBtn) feedbackToggleBtn.classList.remove('active');
     }
 
     if (aboutToggleBtn) aboutToggleBtn.addEventListener('click', toggleAboutDropdown);
     if (helpToggleBtn) helpToggleBtn.addEventListener('click', toggleHelpDropdown);
+    if (feedbackToggleBtn) feedbackToggleBtn.addEventListener('click', toggleFeedbackDropdown);
 
     if (aboutDropdown) aboutDropdown.addEventListener('click', (e) => e.stopPropagation());
     if (helpDropdown) helpDropdown.addEventListener('click', (e) => e.stopPropagation());
+    if (feedbackDropdown) feedbackDropdown.addEventListener('click', (e) => e.stopPropagation());
+
+    if (feedbackForm) {
+      feedbackForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const text = feedbackText.value.trim();
+        if (!text) return;
+
+        feedbackSubmitBtn.disabled = true;
+        feedbackSubmitBtn.innerText = "Sending...";
+
+        try {
+          await fetch(SHEETS_WEB_APP_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              action: 'feedback',
+              feedbackText: text
+            })
+          });
+
+          showToast("Thank you for your feedback!", "success");
+          feedbackText.value = '';
+          closeAllDropdowns();
+        } catch (err) {
+          console.error("Feedback submit error:", err);
+          showToast("Failed to send feedback. Please try again.", "error");
+        } finally {
+          feedbackSubmitBtn.disabled = false;
+          feedbackSubmitBtn.innerText = "Submit Feedback";
+        }
+      });
+    }
 
     document.addEventListener('click', closeAllDropdowns);
 

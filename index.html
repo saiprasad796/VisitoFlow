@@ -1661,10 +1661,10 @@
               <label for="booking-room">Room / Table *</label>
               <select id="booking-room" required>
                 <option value="Room 1">Room 1 (8 seats)</option>
-                <option value="Room 2">Room 2 (6 seats)</option>
+                <option value="Room 2">Room 2 (4 seats)</option>
                 <option value="Room 3">Room 3 (4 seats)</option>
-                <option value="Table 1">Table 1 (4 seats)</option>
-                <option value="Table 2">Table 2 (4 seats)</option>
+                <option value="Table 1">Table 1 (6 seats)</option>
+                <option value="Table 2">Table 2 (6 seats)</option>
                 <option value="Table 3">Table 3 (4 seats)</option>
               </select>
             </div>
@@ -1866,10 +1866,10 @@
 
     const RESOURCES = [
       { id: 'Room 1', name: 'Room 1', seats: 8 },
-      { id: 'Room 2', name: 'Room 2', seats: 6 },
+      { id: 'Room 2', name: 'Room 2', seats: 4 },
       { id: 'Room 3', name: 'Room 3', seats: 4 },
-      { id: 'Table 1', name: 'Table 1', seats: 4 },
-      { id: 'Table 2', name: 'Table 2', seats: 4 },
+      { id: 'Table 1', name: 'Table 1', seats: 6 },
+      { id: 'Table 2', name: 'Table 2', seats: 6 },
       { id: 'Table 3', name: 'Table 3', seats: 4 }
     ];
 
@@ -2131,9 +2131,11 @@
         if (!searchQuery) return true;
         const q = searchQuery.toLowerCase();
         if (isBookingPrivate(b)) {
+          const hostFullName = (b.hostFirstName + (b.hostLastName ? ' ' + b.hostLastName : '')).trim();
           return (
             "busy".includes(q) ||
-            b.room.toLowerCase().includes(q)
+            b.room.toLowerCase().includes(q) ||
+            hostFullName.toLowerCase().includes(q)
           );
         }
         return (
@@ -2348,8 +2350,9 @@
           const badge = document.createElement('div');
           const isPrivate = isBookingPrivate(booking);
           if (isPrivate) {
+            const hostFullName = (booking.hostFirstName + (booking.hostLastName ? ' ' + booking.hostLastName : '')).trim();
             badge.className = `monthly-booking-badge busy-badge`;
-            badge.innerText = `${booking.startTime} - ${booking.room} Busy`;
+            badge.innerText = `${booking.startTime} - ${booking.room} - Busy Host-${hostFullName}`;
             badge.addEventListener('click', (e) => {
               e.stopPropagation();
               openDetailsModal(booking.id);
@@ -2480,8 +2483,9 @@
           card.style.width = `calc(${widthPct}% - 6px)`;
           card.style.left = `${leftPct}%`;
           
+          const hostFullName = (booking.hostFirstName + (booking.hostLastName ? ' ' + booking.hostLastName : '')).trim();
           const displayTitle = isPrivate 
-            ? (showRoomLabel ? `${booking.room} busy` : 'busy')
+            ? (showRoomLabel ? `${booking.room} - Busy` : 'Busy')
             : (booking.visitorCompany ? `${booking.visitorName} - ${booking.visitorCompany}` : booking.visitorName);
 
           const isPendingApproval = (booking.ceoApproval === 'Yes' && booking.status === 'pending');
@@ -2503,8 +2507,8 @@
               card.innerHTML = `
                 <div class="appt-header-row">
                   <div class="appt-title" title="${displayTitle}">${displayTitle}</div>
-                  <div class="appt-time" title="${minutesToDisplayStr(startMin)} - ${minutesToDisplayStr(endMin)}">
-                    ${minutesToCompactDisplayStr(startMin)} - ${minutesToCompactDisplayStr(endMin)}
+                  <div class="appt-time" title="${minutesToDisplayStr(startMin)} - ${minutesToDisplayStr(endMin)} · Host-${hostFullName}">
+                    Host-${hostFullName}
                   </div>
                 </div>
               `;
@@ -2534,6 +2538,7 @@
                   <div class="appt-title">${displayTitle}</div>
                   <div class="appt-time">${minutesToDisplayStr(startMin)} - ${minutesToDisplayStr(endMin)}</div>
                 </div>
+                <div class="appt-badge" style="background-color: rgba(255, 255, 255, 0.45); color: #475569;">Host-${hostFullName}</div>
               `;
             } else {
               let cleanLabel = booking.purpose || '';
